@@ -1,3 +1,10 @@
+# 0.5.4
+- Chore: 进行 `@ticoag/lark-mcp` 的首次人工 npm 发布，为后续 trusted publishing 建立包入口
+- Fix: 对齐当前 monorepo / CI 修复后的发布版本与源码状态
+
+- Chore: Perform the initial manual npm publish for `@ticoag/lark-mcp` so trusted publishing can be configured afterward
+- Fix: Align the published release version with the current monorepo and CI fixes
+
 # 0.5.3
 - Fix: GitHub Actions 中 `npm ci` 触发 `prepare` 导致 OOM，改为 install 阶段忽略 scripts 并在显式步骤中构建
 - Fix: `pack:check` 与 publish 改为 `--ignore-scripts`，避免重复触发 `prepare`

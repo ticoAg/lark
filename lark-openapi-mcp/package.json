@@ -1,6 +1,6 @@
 {
   "name": "@ticoag/lark-mcp",
-  "version": "0.5.3",
+  "version": "0.5.4",
   "description": "Feishu/Lark OpenAPI MCP",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
