@@ -1,6 +1,6 @@
 {
   "name": "@ticoag/lark-mcp",
-  "version": "0.5.2",
+  "version": "0.5.3",
   "description": "Feishu/Lark OpenAPI MCP",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -24,8 +24,8 @@
     "dev": "ts-node src/index.ts",
     "dev:cli": "ts-node src/cli.ts",
     "format": "prettier --write \"src/**/*.ts\"",
-    "prepare": "npm run build",
-    "pack:check": "npm pack --dry-run",
+    "prepare": "node -e \"if (!process.env.CI) process.exit(1); console.log('Skipping prepare build in CI')\" || npm run build",
+    "pack:check": "npm pack --dry-run --ignore-scripts",
     "test": "jest",
     "test:ci": "jest tests/auth/store.test.ts tests/command-surface/command-surface.test.ts tests/command-surface/default-registry.test.ts tests/mcp-server/shared/init.test.ts tests/mcp-tool/mcp-tool.test.ts --runInBand",
     "test:watch": "jest --watch",

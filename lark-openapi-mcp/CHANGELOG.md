@@ -1,3 +1,10 @@
+# 0.5.3
+- Fix: GitHub Actions 中 `npm ci` 触发 `prepare` 导致 OOM，改为 install 阶段忽略 scripts 并在显式步骤中构建
+- Fix: `pack:check` 与 publish 改为 `--ignore-scripts`，避免重复触发 `prepare`
+
+- Fix: Avoid OOM in GitHub Actions by running `npm ci --ignore-scripts` and building explicitly in later steps
+- Fix: Run pack and publish with `--ignore-scripts` to avoid duplicate `prepare` execution
+
 # 0.5.2
 - Chore: 将仓库收口为 `ticoag/lark` monorepo，并统一 MCP 与 Skill 文档入口
 - Chore: npm 包发布口径切换为 `@ticoag/lark-mcp`
