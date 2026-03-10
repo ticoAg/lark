@@ -32,6 +32,8 @@ jobs:
   publish:
     if: github.repository == 'ticoag/lark'
     runs-on: ubuntu-latest
+    env:
+      NODE_OPTIONS: --max-old-space-size=4096
     defaults:
       run:
         shell: bash

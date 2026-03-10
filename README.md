@@ -87,11 +87,13 @@ npx -y @ticoag/lark-mcp login -a <app_id> -s <app_secret>
 
 - CI workflow：`.github/workflows/ci.yml`
   - 对 `lark-openapi-mcp` 执行 `npm ci`、`npm run build`、`npm run test:ci`、`npm run pack:check`
+  - GitHub Actions 会为 `lark-openapi-mcp` job 注入 `NODE_OPTIONS=--max-old-space-size=4096`，避免 `tsc` 在默认堆上限下 OOM
   - 对工作区任务文档执行 `python3 scripts/taskctl.py lint`
 - npm 发布 workflow：`.github/workflows/publish-npm.yml`
   - 推荐通过 tag 发布：`lark-openapi-mcp-vX.Y.Z`
   - 也支持 `workflow_dispatch` 手动执行，并用 `expected_version` / `dry_run` 做保护
   - 发布前会校验 `lark-openapi-mcp/package.json` 版本与 tag 一致
+  - publish job 同样注入 `NODE_OPTIONS=--max-old-space-size=4096`
   - 正式发布命令为 `npm publish --provenance --access public`
 - 发布前准备：
   - 在 npm 后台为 `@ticoag/lark-mcp` 配置 GitHub trusted publishing，仓库填 `ticoag/lark`

@@ -238,6 +238,7 @@ npx -y @ticoag/lark-mcp login -a cli_xxxx -s yyyyy
 
 - CI：`../.github/workflows/ci.yml`
 - npm 发布：`../.github/workflows/publish-npm.yml`
+- 两个 workflow 都会为 `lark-openapi-mcp` job 注入 `NODE_OPTIONS=--max-old-space-size=4096`，避免 `tsc` 在 GitHub Actions 默认 Node 堆上限下 OOM
 
 推荐发布流程：
 

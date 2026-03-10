@@ -54,6 +54,12 @@
 
 如果 npm 后台尚未配置 trusted publishing，workflow 本身不会帮你绕过这个前提。
 
+### 5. GitHub Actions Node 内存
+
+- `lark-openapi-mcp` 的 GitHub Actions job 统一注入 `NODE_OPTIONS=--max-old-space-size=4096`
+- 原因是 `tsc` 在 `ubuntu-latest` / Node 20 默认堆上限下可能触发 OOM
+- 本地开发默认仍直接使用 `npm run build`；只有在本地也复现堆内存不足时，才额外临时加同样的 `NODE_OPTIONS`
+
 ## Agent 执行规则
 
 ### 可以做的事
@@ -76,13 +82,14 @@
 如果改了 `.github/workflows/ci.yml`，至少确认：
 
 1. `working-directory` 仍然指向 `lark-openapi-mcp`
-2. 仍然执行：
+2. `NODE_OPTIONS=--max-old-space-size=4096` 仍对 `lark-openapi-mcp` job 生效
+3. 仍然执行：
    - `npm ci`
    - `npm run build`
    - `npm run test:ci`
    - `npm run pack:check`
-3. 根目录的 `scripts/taskctl.py lint` 仍然可运行
-4. 没有把 publish 逻辑混到普通 CI workflow
+4. 根目录的 `scripts/taskctl.py lint` 仍然可运行
+5. 没有把 publish 逻辑混到普通 CI workflow
 
 ## 修改发布流程时的检查清单
 
@@ -91,15 +98,16 @@
 1. 触发器仍然覆盖：
    - `push.tags: lark-openapi-mcp-v*`
    - `workflow_dispatch`
-2. `permissions` 仍包含：
+2. `NODE_OPTIONS=--max-old-space-size=4096` 仍对 publish job 生效
+3. `permissions` 仍包含：
    - `contents: read`
    - `id-token: write`
-3. 发布前仍执行：
+4. 发布前仍执行：
    - 版本校验
    - `npm run build`
    - `npm run test:ci`
    - `npm run pack:check`
-4. 正式发布仍使用：
+5. 正式发布仍使用：
    - `npm publish --provenance --access public`
 
 ## 本地验证命令

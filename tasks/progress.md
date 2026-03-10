@@ -1,6 +1,6 @@
 ---
 schema: lark-progress-v1
-updated: 2026-03-11T02:12:00+08:00
+updated: 2026-03-11T16:20:00+08:00
 focus: completed
 active: []
 blockers: []
@@ -12,9 +12,15 @@ blockers: []
 
 - 当前 focus：全部活跃里程碑已完成
 - 并行 active：无
-- 最近完成：新增 `ci.md` 作为 coding agent 的 CI / release 执行指南
-- 下一步：在 GitHub / npm 后台完成 trusted publishing 绑定，然后即可按 tag 发布
+- 最近完成：修复 GitHub Actions 中 `lark-openapi-mcp` 的 `tsc` OOM，补齐 CI / publish 的 Node 堆内存约定
+- 下一步：推送本次修复后，重新触发 `CI` 与 `Publish npm Package` 验证远端通过
 - 阻塞：无
+
+## 2026-03-11 16:20 修复 GitHub Actions 构建 OOM
+- 里程碑：07 Monorepo 发布与文档收口（维护）
+- 已完成：定位到最近失败的 `CI` 与 `Publish npm Package` 都在 `npm run build` 阶段触发 Node `JavaScript heap out of memory`；为 `.github/workflows/ci.yml` 与 `.github/workflows/publish-npm.yml` 的 `lark-openapi-mcp` / `publish` job 注入 `NODE_OPTIONS=--max-old-space-size=4096`；同步更新 `ci.md`、根 `README.md` 与 `lark-openapi-mcp/README*.md` 的说明。
+- 下一步：推送后重新查看 GitHub Actions 运行结果，确认 build / test / pack 阶段都恢复通过。
+- 阻塞 / 风险：当前修复针对 GitHub Actions 的默认 Node 堆上限；若后续 TypeScript 编译规模继续增长，仍需评估进一步拆分编译或优化 tsconfig。
 
 ## 2026-03-11 02:12 增加 CI 指南文档
 - 里程碑：07 Monorepo 发布与文档收口（维护）

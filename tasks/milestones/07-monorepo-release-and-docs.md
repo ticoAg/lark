@@ -5,7 +5,7 @@ slug: monorepo-release-and-docs
 status: done
 deps: [05, 06]
 owner: ticoag
-updated: 2026-03-11T01:43+08:00
+updated: 2026-03-11T16:20+08:00
 ---
 
 # 里程碑 07 - Monorepo 发布与文档收口
@@ -49,3 +49,7 @@ updated: 2026-03-11T01:43+08:00
 - 通过全文检索确认旧包名与旧独立仓库地址只保留在 upstream/source 声明中
 - 通过 `npm run build`
 - 通过 `npx jest tests/auth/store.test.ts tests/command-surface/command-surface.test.ts tests/command-surface/default-registry.test.ts tests/mcp-server/shared/init.test.ts tests/mcp-tool/mcp-tool.test.ts --runInBand`
+
+## 维护记录
+
+- 2026-03-11：修复 GitHub Actions 中 `lark-openapi-mcp` 的 `tsc` OOM；在 `CI` 与 `Publish npm Package` workflow 的对应 job 注入 `NODE_OPTIONS=--max-old-space-size=4096`，并同步更新 CI / release 文档说明。

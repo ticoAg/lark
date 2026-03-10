@@ -241,6 +241,7 @@ The monorepo defines GitHub Actions workflows for CI and npm publishing:
 
 - CI: `../.github/workflows/ci.yml`
 - npm publish: `../.github/workflows/publish-npm.yml`
+- Both workflows set `NODE_OPTIONS=--max-old-space-size=4096` for the `lark-openapi-mcp` job so `tsc` does not hit the default Node heap limit on GitHub Actions
 
 Release flow:
 
