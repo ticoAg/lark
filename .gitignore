@@ -1,0 +1,16 @@
+.DS_Store
+.idea/
+.vscode/
+
+.cache/
+coverage/
+dist/
+node_modules/
+
+*.log
+*.tmp
+
+lark-openapi-mcp/node_modules/
+lark-openapi-mcp/dist/
+lark-openapi-mcp/coverage/
+lark-skill/node_modules/

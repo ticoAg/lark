@@ -1,0 +1,79 @@
+name: Publish npm Package
+
+on:
+  push:
+    tags:
+      - "lark-openapi-mcp-v*"
+  workflow_dispatch:
+    inputs:
+      release_ref:
+        description: "Git ref to publish from, defaults to the current branch/tag"
+        required: false
+        type: string
+      expected_version:
+        description: "Expected package version for manual publish or dry-run"
+        required: false
+        type: string
+      dry_run:
+        description: "Run build/test/pack checks without publishing"
+        required: true
+        default: true
+        type: boolean
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: publish-npm-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    if: github.repository == 'ticoag/lark'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+        working-directory: lark-openapi-mcp
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.release_ref || github.ref }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          registry-url: "https://registry.npmjs.org"
+          cache: npm
+          cache-dependency-path: lark-openapi-mcp/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Verify release version from tag
+        if: github.event_name == 'push'
+        run: python3 ../scripts/verify_npm_release.py --package package.json --tag "${GITHUB_REF_NAME}" --prefix "lark-openapi-mcp-v"
+
+      - name: Verify expected version for manual run
+        if: github.event_name == 'workflow_dispatch' && github.event.inputs.expected_version != ''
+        run: python3 ../scripts/verify_npm_release.py --package package.json --expected-version "${{ github.event.inputs.expected_version }}"
+
+      - name: Build
+        run: npm run build
+
+      - name: Test
+        run: npm run test:ci
+
+      - name: Validate package contents
+        run: npm run pack:check
+
+      - name: Publish dry run
+        if: github.event_name == 'workflow_dispatch' && github.event.inputs.dry_run == 'true'
+        run: npm publish --dry-run --access public
+
+      - name: Publish to npm
+        if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && github.event.inputs.dry_run != 'true')
+        run: npm publish --provenance --access public

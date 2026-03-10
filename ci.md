@@ -1,0 +1,158 @@
+# CI / Release Guide for Coding Agents
+
+本文档给在 `ticoag/lark` 仓库内工作的 coding agent 使用，目标是让 agent 在修改 CI、发包、版本和发布文档时遵循统一流程，避免误发版或破坏 monorepo 约定。
+
+## 适用范围
+
+当前 CI / release 只覆盖：
+
+- `lark-openapi-mcp` 的构建、测试、打包校验
+- `@ticoag/lark-mcp` 的 npm 发布
+
+`lark-skill` 目前没有单独的 npm 发布流程。
+
+## 必读文件
+
+在修改 CI / release 前，按下面顺序阅读：
+
+1. `AGENTS.md`
+2. `workflow.md`
+3. `README.md`
+4. `.github/workflows/ci.yml`
+5. `.github/workflows/publish-npm.yml`
+6. `lark-openapi-mcp/package.json`
+7. `lark-openapi-mcp/CHANGELOG.md`
+
+## 当前约定
+
+### 1. Monorepo 结构
+
+- 根仓库：`ticoag/lark`
+- npm 包目录：`lark-openapi-mcp`
+- npm 包名：`@ticoag/lark-mcp`
+- CLI 名称：`lark-mcp`
+
+### 2. Workflow 文件
+
+- CI：`.github/workflows/ci.yml`
+- 发布：`.github/workflows/publish-npm.yml`
+
+### 3. 版本与 tag 规则
+
+- `package.json` 中的 `version` 是发布单一事实来源
+- 发布 tag 必须使用：`lark-openapi-mcp-vX.Y.Z`
+- tag 版本必须与 `lark-openapi-mcp/package.json` 中的 `version` 完全一致
+- workflow 会通过 `scripts/verify_npm_release.py` 做一致性校验
+
+### 4. 发布方式
+
+默认使用 npm trusted publishing：
+
+- GitHub 仓库：`ticoag/lark`
+- workflow：`.github/workflows/publish-npm.yml`
+- 正式发布命令：`npm publish --provenance --access public`
+
+如果 npm 后台尚未配置 trusted publishing，workflow 本身不会帮你绕过这个前提。
+
+## Agent 执行规则
+
+### 可以做的事
+
+- 修改 `.github/workflows/*.yml`
+- 修改 `lark-openapi-mcp/package.json` 中与 CI / release 相关的 script
+- 修改 `README.md`、`lark-openapi-mcp/README.md`、`lark-openapi-mcp/README_ZH.md`
+- 修改 `scripts/verify_npm_release.py`
+- 运行本地只读或可重复验证，例如 `npm run build`、`npm run test:ci`、`npm run pack:check`
+
+### 不要直接做的事
+
+- 不要在未确认版本号和 changelog 的情况下创建 release tag
+- 不要在未说明影响的情况下修改包名、tag 规则或 workflow 名称
+- 不要删除 `--provenance`、`--access public`、版本校验步骤，除非文档同步更新并说明原因
+- 不要擅自引入另一套 release 系统（如 changesets / semantic-release）替换现有流程，除非用户明确要求
+
+## 修改 CI 时的检查清单
+
+如果改了 `.github/workflows/ci.yml`，至少确认：
+
+1. `working-directory` 仍然指向 `lark-openapi-mcp`
+2. 仍然执行：
+   - `npm ci`
+   - `npm run build`
+   - `npm run test:ci`
+   - `npm run pack:check`
+3. 根目录的 `scripts/taskctl.py lint` 仍然可运行
+4. 没有把 publish 逻辑混到普通 CI workflow
+
+## 修改发布流程时的检查清单
+
+如果改了 `.github/workflows/publish-npm.yml`，至少确认：
+
+1. 触发器仍然覆盖：
+   - `push.tags: lark-openapi-mcp-v*`
+   - `workflow_dispatch`
+2. `permissions` 仍包含：
+   - `contents: read`
+   - `id-token: write`
+3. 发布前仍执行：
+   - 版本校验
+   - `npm run build`
+   - `npm run test:ci`
+   - `npm run pack:check`
+4. 正式发布仍使用：
+   - `npm publish --provenance --access public`
+
+## 本地验证命令
+
+在仓库根目录执行：
+
+```bash
+python3 scripts/taskctl.py lint
+```
+
+在 `lark-openapi-mcp` 目录执行：
+
+```bash
+npm ci
+npm run build
+npm run test:ci
+npm run pack:check
+```
+
+校验 tag 与版本是否一致：
+
+```bash
+python3 scripts/verify_npm_release.py \
+  --package lark-openapi-mcp/package.json \
+  --tag lark-openapi-mcp-v0.5.1 \
+  --prefix lark-openapi-mcp-v
+```
+
+## 标准发布顺序
+
+1. 更新 `lark-openapi-mcp/package.json` 中的 `version`
+2. 更新 `lark-openapi-mcp/CHANGELOG.md`
+3. 运行本地验证
+4. 提交代码
+5. 创建并推送 tag：`lark-openapi-mcp-vX.Y.Z`
+6. 等待 GitHub Actions 发布到 npm
+
+## 文档同步要求
+
+如果你修改了 CI / release 规则，同时更新这些文档中的相关部分：
+
+- `README.md`
+- `lark-openapi-mcp/README.md`
+- `lark-openapi-mcp/README_ZH.md`
+- `tasks/progress.md`
+
+如修改了发布约定，也同步更新：
+
+- `tasks/milestones/07-monorepo-release-and-docs.md`
+
+## Upstream / License 注意事项
+
+- `lark-openapi-mcp` fork source: `larksuite/lark-openapi-mcp`
+- `lark-skill` development based on: `whatevertogo/FeiShuSkill`
+- 不要删除子目录原始 `LICENSE`
+- 不要把维护版文档写回“官方发行”口径
