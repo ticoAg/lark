@@ -1,6 +1,6 @@
 ---
 schema: lark-blockers-v1
-updated: 2026-03-11T18:42+08:00
+updated: 2026-03-11T19:11+08:00
 ---
 
 # 活跃阻塞项（Blockers）
@@ -11,4 +11,4 @@ updated: 2026-03-11T18:42+08:00
 
 | id | status | since | owner | milestone | note |
 |---|---|---|---|---|---|
-| npm-publish-eotp | open | 2026-03-11 18:20 +08:00 | ticoag | 07 | `Publish npm Package` 运行 `22933555027` 已验证 404 问题消失，但 publish job 因 Node 20 / npm 10 未满足 trusted publishing 运行时要求而回退到 `NPM_TOKEN`，最终触发 `EOTP`；已改为纯 OIDC + Node 24，待下一个 tag run 验证。 |
+| npm-trusted-publisher-404 | open | 2026-03-11 19:08 +08:00 | ticoag | 07 | `Publish npm Package` 运行 `22934778508` 已在纯 OIDC 路径下真正执行 `npm publish --provenance --access public`，但 npm 最终返回 `E404` / `could not be found or you do not have permission to access it`；workflow 自身问题已排除，需回到 npm 后台复核 `@ticoag/lark-mcp` 的 trusted publisher 绑定与 package 权限。 |

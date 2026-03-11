@@ -1,6 +1,6 @@
 ---
 schema: lark-progress-v1
-updated: 2026-03-11T18:51:00+08:00
+updated: 2026-03-11T19:11:00+08:00
 focus: completed
 active: []
 blockers: []
@@ -12,9 +12,15 @@ blockers: []
 
 - 当前 focus：全部活跃里程碑已完成
 - 并行 active：无
-- 最近完成：把 `CI` / `Publish npm Package` 的重复 checks 提炼成共享 workflow，同时保留纯 OIDC 发布路径
-- 下一步：推送共享 workflow + 纯 OIDC 修复后，用新的版本 tag 再次验证 trusted publishing
-- 阻塞：当前 `0.5.5` 的 publish run 已失败且版本号已占用；需通过后续新版本验证纯 OIDC 修复
+- 最近完成：端到端验证到 `0.5.8`，已经把 publish workflow 自身的 token/EOTP、工作目录、脚本缺失问题全部排除
+- 下一步：核对 npm 后台 trusted publisher 与 `@ticoag/lark-mcp` 的绑定细节，重点确认仓库/工作流映射与权限是否真正生效
+- 阻塞：`0.5.8` 的 `Publish npm Package` 已经在纯 OIDC 路径下执行到真实 `npm publish`，但 npm 仍返回 404 权限类错误，说明剩余问题在 npm trusted publisher / package permission 侧，而不是 workflow 本身
+
+## 2026-03-11 19:11 纯 OIDC 发布已触达真实 npm 权限错误
+- 里程碑：07 Monorepo 发布与文档收口（维护）
+- 已完成：连续通过 `0.5.6`、`0.5.7`、`0.5.8` 三轮真实 tag 验证，逐步修复 publish workflow 自身问题：先移除多余的 `npm install -g npm@latest`，再为 publish job 恢复 checkout，最终在 `0.5.8` 的 `Publish npm Package` 运行 `22934778508` 中成功跑通共享 checks、artifact 下载、tag/version 校验，并实际执行 `npm publish --provenance --access public`。
+- 下一步：回到 npm 后台检查 `@ticoag/lark-mcp` 的 trusted publisher 绑定是否与当前 GitHub 仓库/工作流完全一致，并确认该 package 确实允许 `ticoAg/lark` 通过 OIDC 发布；必要时删除并重新创建 trusted publisher 绑定后，再发下一版本验证。
+- 阻塞 / 风险：`22934778508` 的 publish 日志显示 provenance 已生成并写入 transparency log，但最终返回 `npm ERR! code E404` / `The requested resource '@ticoag/lark-mcp@0.5.8' could not be found or you do not have permission to access it.`；这表明当前剩余问题位于 npm 权限或 trusted publisher 绑定，而不是本仓 workflow 逻辑。
 
 ## 2026-03-11 18:51 共享 CI / Publish checks
 - 里程碑：07 Monorepo 发布与文档收口（维护）
