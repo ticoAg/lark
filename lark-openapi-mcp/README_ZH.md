@@ -247,7 +247,7 @@ npx -y @ticoag/lark-mcp login -a cli_xxxx -s yyyyy
 3. 推送形如 `lark-openapi-mcp-vX.Y.Z` 的 git tag
 4. 由 GitHub Actions 执行 `npm publish --provenance --access public` 发布 `@ticoag/lark-mcp`
 
-首次发布前，请先在 npm 后台为 `@ticoag/lark-mcp` 配置 GitHub trusted publishing，仓库为 `ticoag/lark`，workflow 为 `.github/workflows/publish-npm.yml`。
+发布 workflow 默认优先使用 npm trusted publishing；请在 npm 后台为 `@ticoag/lark-mcp` 绑定 GitHub 仓库 `ticoag/lark` 与 workflow `.github/workflows/publish-npm.yml`。若仓库已配置 `NPM_TOKEN` secret，则在 OIDC trusted publishing 尚未可用时可自动回退到 token 发布。
 
 ## 常见问题
 

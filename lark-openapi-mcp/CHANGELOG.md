@@ -1,3 +1,10 @@
+# 0.5.5
+- Fix: npm 发布 workflow 在 `Publish to npm` 步骤增加 `NPM_TOKEN` fallback，覆盖 trusted publishing 首发包或 OIDC 尚未就绪场景
+- Chore: 同步根 README、包 README、CI 指南与任务文档中的发布说明
+
+- Fix: Add `NPM_TOKEN` fallback to the npm publish workflow so first-package release or not-yet-ready OIDC trusted publishing can still publish successfully
+- Chore: Sync the root README, package README, CI guide, and task docs with the updated release path
+
 # 0.5.4
 - Chore: 进行 `@ticoag/lark-mcp` 的首次人工 npm 发布，为后续 trusted publishing 建立包入口
 - Fix: 对齐当前 monorepo / CI 修复后的发布版本与源码状态

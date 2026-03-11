@@ -1,6 +1,6 @@
 ---
 schema: lark-progress-v1
-updated: 2026-03-11T16:20:00+08:00
+updated: 2026-03-11T17:35:00+08:00
 focus: completed
 active: []
 blockers: []
@@ -12,9 +12,21 @@ blockers: []
 
 - 当前 focus：全部活跃里程碑已完成
 - 并行 active：无
-- 最近完成：修复 GitHub Actions 中 `lark-openapi-mcp` 的 `tsc` OOM，补齐 CI / publish 的 Node 堆内存约定
-- 下一步：推送本次修复后，重新触发 `CI` 与 `Publish npm Package` 验证远端通过
-- 阻塞：无
+- 最近完成：为 npm 发布 workflow 增加 `NPM_TOKEN` fallback，覆盖首发包 / trusted publishing 未就绪场景
+- 下一步：在 GitHub 仓库补充 `NPM_TOKEN` secret 后，用下一个版本 tag 验证 `Publish npm Package` 是否恢复稳定
+- 阻塞：当前 `0.5.4` 的 tag run 已失败且该版本已人工发布，需通过后续新版本验证 workflow 修复
+
+## 2026-03-11 17:35 npm 发布增加 token fallback
+- 里程碑：07 Monorepo 发布与文档收口（维护）
+- 已完成：复盘 `Publish npm Package` 运行 `22918024168`，确认失败点在 `Publish to npm` 步骤对 `@ticoag/lark-mcp` 返回 npm `E404`；将 `.github/workflows/publish-npm.yml` 的发布步骤补充 `NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}`，使 npm CLI 继续优先使用 GitHub OIDC trusted publishing，但在 OIDC 尚未就绪时可回退到 token；同步更新 `ci.md`、根 `README.md` 与 `lark-openapi-mcp/README*.md` 的说明。
+- 下一步：在 GitHub 仓库配置 `NPM_TOKEN` secret，并使用新的版本 tag 重新验证 Actions 发布链路。
+- 阻塞 / 风险：当前无法在本地直接验证 GitHub Actions secret 和 npm 后台 trusted publisher 绑定状态；修复需依赖远端下一次 publish run 才能闭环。
+
+## 2026-03-11 17:28 首次人工 npm 发布执行
+- 里程碑：07 Monorepo 发布与文档收口（维护）
+- 已完成：将 `lark-openapi-mcp` 版本推进到 `0.5.4`，补充首发 changelog；本地完成 `build`、`test:ci`、`pack:check`、`verify_npm_release.py` 校验；使用新的 npm 发布 token 执行 `npm publish --access public`，npm CLI 返回 `+ @ticoag/lark-mcp@0.5.4`。
+- 下一步：继续确认 npm 公网 registry 中 `@ticoag/lark-mcp` 的可见性；若确认成功，再把 trusted publishing 切换为后续默认路径；另外排查本机 `git push origin main` 卡住，补推 `ff58b40` 和 `lark-openapi-mcp-v0.5.4`。
+- 阻塞 / 风险：发布后立刻执行的 `npm view @ticoag/lark-mcp version` 与 `https://registry.npmjs.org/@ticoag%2flark-mcp` 仍返回 404，暂时无法从公网接口验证首发结果。
 
 ## 2026-03-11 16:20 修复 GitHub Actions 构建 OOM
 - 里程碑：07 Monorepo 发布与文档收口（维护）

@@ -5,7 +5,7 @@ slug: monorepo-release-and-docs
 status: done
 deps: [05, 06]
 owner: ticoag
-updated: 2026-03-11T16:20+08:00
+updated: 2026-03-11T17:35+08:00
 ---
 
 # 里程碑 07 - Monorepo 发布与文档收口
@@ -53,3 +53,4 @@ updated: 2026-03-11T16:20+08:00
 ## 维护记录
 
 - 2026-03-11：修复 GitHub Actions 中 `lark-openapi-mcp` 的 `tsc` OOM；在 `CI` 与 `Publish npm Package` workflow 的对应 job 注入 `NODE_OPTIONS=--max-old-space-size=4096`，并同步更新 CI / release 文档说明。
+- 2026-03-11：针对 `@ticoag/lark-mcp@0.5.4` 首次 tag 发布的 npm 404，将 `Publish to npm` 步骤改为“优先 trusted publishing，存在 `NPM_TOKEN` secret 时允许自动 fallback 到 token”；同步更新根 README、包 README 和 `ci.md` 的发布说明。

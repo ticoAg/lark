@@ -51,8 +51,9 @@
 - GitHub 仓库：`ticoag/lark`
 - workflow：`.github/workflows/publish-npm.yml`
 - 正式发布命令：`npm publish --provenance --access public`
+- `Publish to npm` 步骤默认优先走 GitHub OIDC trusted publishing；若仓库配置了 `NPM_TOKEN` secret，则 npm CLI 可在 OIDC 不可用时回退到 token
 
-如果 npm 后台尚未配置 trusted publishing，workflow 本身不会帮你绕过这个前提。
+建议保留一个仓库级 `NPM_TOKEN` 作为首发包 / trusted publishing 尚未完全配置时的 bootstrap fallback；后续仍以 trusted publishing 为默认路径。
 
 ### 5. GitHub Actions Node 内存
 
@@ -109,6 +110,9 @@
    - `npm run pack:check`
 5. 正式发布仍使用：
    - `npm publish --provenance --access public`
+6. 若需覆盖首发包或 npm trusted publishing 临时未就绪场景：
+   - `Publish to npm` 步骤仍优先使用 OIDC
+   - 仓库 secret `NPM_TOKEN` 存在时可自动回退到 token 发布
 
 ## 本地验证命令
 
@@ -142,8 +146,9 @@ python3 scripts/verify_npm_release.py \
 2. 更新 `lark-openapi-mcp/CHANGELOG.md`
 3. 运行本地验证
 4. 提交代码
-5. 创建并推送 tag：`lark-openapi-mcp-vX.Y.Z`
-6. 等待 GitHub Actions 发布到 npm
+5. 如是首发包或 npm 后台 trusted publishing 尚未完全配置，先在 GitHub 仓库配置 `NPM_TOKEN` secret 作为 fallback
+6. 创建并推送 tag：`lark-openapi-mcp-vX.Y.Z`
+7. 等待 GitHub Actions 发布到 npm
 
 ## 文档同步要求
 
