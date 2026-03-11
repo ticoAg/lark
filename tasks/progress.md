@@ -1,6 +1,6 @@
 ---
 schema: lark-progress-v1
-updated: 2026-03-11T17:35:00+08:00
+updated: 2026-03-11T18:23:00+08:00
 focus: completed
 active: []
 blockers: []
@@ -12,9 +12,15 @@ blockers: []
 
 - 当前 focus：全部活跃里程碑已完成
 - 并行 active：无
-- 最近完成：为 npm 发布 workflow 增加 `NPM_TOKEN` fallback，覆盖首发包 / trusted publishing 未就绪场景
-- 下一步：在 GitHub 仓库补充 `NPM_TOKEN` secret 后，用下一个版本 tag 验证 `Publish npm Package` 是否恢复稳定
-- 阻塞：当前 `0.5.4` 的 tag run 已失败且该版本已人工发布，需通过后续新版本验证 workflow 修复
+- 最近完成：完整跑通 `0.5.5` 的本地验证、release commit、tag push 与远端 Actions 观察
+- 下一步：更换为可用于 automation 的 npm publish token，或完成 trusted publishing，无需 token fallback 也能直接发包
+- 阻塞：`Publish npm Package` 在 `0.5.5` 的真实远端发布中不再报 404，但当前 `NPM_TOKEN` 触发 npm `EOTP`，无法无人值守发布
+
+## 2026-03-11 18:23 真实发版验证命中 EOTP
+- 里程碑：07 Monorepo 发布与文档收口（维护）
+- 已完成：将版本推进到 `0.5.5`，补充 changelog，完成本地 `npm ci`、`build`、`test:ci`、`pack:check`、`taskctl.py lint` 与 `verify_npm_release.py`；提交 `fc9e3a2`、推送 `lark-openapi-mcp-v0.5.5`，远端 `CI` 运行 `22933555056` 全部通过。
+- 下一步：替换 GitHub Secret `NPM_TOKEN` 为不要求交互式 OTP 的 automation / granular publish token，或在 npm 后台完成 trusted publishing 后再发下一个版本。
+- 阻塞 / 风险：`Publish npm Package` 运行 `22933555027` 在 `Publish to npm` 步骤通过了 build/test/pack 和 provenance 生成，但最终报错 `npm ERR! code EOTP`；npm registry 当前公开版本仍为 `0.5.4`。
 
 ## 2026-03-11 17:35 npm 发布增加 token fallback
 - 里程碑：07 Monorepo 发布与文档收口（维护）
