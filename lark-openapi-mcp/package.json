@@ -1,6 +1,6 @@
 {
   "name": "@ticoag/lark-mcp",
-  "version": "0.5.8",
+  "version": "0.5.5",
   "description": "Feishu/Lark OpenAPI MCP",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -38,14 +38,14 @@
     "open-api",
     "ai"
   ],
-  "homepage": "https://github.com/ticoag/lark/tree/main/lark-openapi-mcp",
+  "homepage": "https://github.com/ticoAg/lark/tree/main/lark-openapi-mcp",
   "repository": {
     "type": "git",
-    "url": "https://github.com/ticoag/lark.git",
+    "url": "https://github.com/ticoAg/lark.git",
     "directory": "lark-openapi-mcp"
   },
   "bugs": {
-    "url": "https://github.com/ticoag/lark/issues"
+    "url": "https://github.com/ticoAg/lark/issues"
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org",

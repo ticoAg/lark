@@ -1,31 +1,14 @@
-# 0.5.8
-- Fix: 在 publish job 中恢复 checkout，确保版本校验脚本与仓库元数据在 artifact 下载后的发布阶段仍可用
-- Chore: 持续验证共享 checks + 纯 OIDC trusted publishing 的真实发包链路
-
-- Fix: Restore checkout in the publish job so version-verification scripts and repository metadata remain available after downloading the package artifact
-- Chore: Continue validating the real publish pipeline with shared checks plus pure OIDC trusted publishing
-
-# 0.5.7
-- Fix: 移除 publish job 中多余的 `npm install -g npm@latest` 步骤，避免在 artifact 下载前因为工作目录不存在而提前失败
-- Chore: 继续沿用纯 OIDC trusted publishing 与共享 checks workflow，验证真实发包链路
-
-- Fix: Remove the extra `npm install -g npm@latest` step from the publish job so it no longer fails before the artifact download due to a missing working directory
-- Chore: Keep the pure OIDC trusted publishing path and shared checks workflow while re-validating the real publish pipeline
-
-# 0.5.6
-- Fix: 切回纯 OIDC trusted publishing，移除 publish token fallback，避免 npm publish 回退到 `EOTP`
-- Chore: 抽取共享 workflow `lark-openapi-checks.yml`，让 `CI` 与 `Publish npm Package` 复用同一套 package checks
-- Chore: 将 publish job 提升到 Node 24 并升级最新 npm CLI，以满足 npm trusted publishing 运行时要求
-
-- Fix: Return to pure OIDC trusted publishing and remove the publish-token fallback so npm publish no longer falls back to `EOTP`
-- Chore: Extract a shared workflow `lark-openapi-checks.yml` so `CI` and `Publish npm Package` reuse the same package checks
-- Chore: Move the publish job to Node 24 and upgrade npm CLI to satisfy npm trusted publishing runtime requirements
-
 # 0.5.5
-- Fix: npm 发布 workflow 在 `Publish to npm` 步骤增加 `NPM_TOKEN` fallback，覆盖 trusted publishing 首发包或 OIDC 尚未就绪场景
+- Fix: 切回纯 OIDC trusted publishing，移除 publish token fallback，避免 npm publish 回退到 `EOTP`
+- Fix: 在 publish job 中恢复 checkout，确保版本校验脚本与仓库元数据在 artifact 下载后的发布阶段仍可用
+- Chore: 抽取共享 workflow `lark-openapi-checks.yml`，让 `CI` 与 `Publish npm Package` 复用同一套 package checks
+- Chore: publish job 使用 Node 24，并基于共享 checks artifact 执行真正的 `npm publish`
 - Chore: 同步根 README、包 README、CI 指南与任务文档中的发布说明
 
-- Fix: Add `NPM_TOKEN` fallback to the npm publish workflow so first-package release or not-yet-ready OIDC trusted publishing can still publish successfully
+- Fix: Return to pure OIDC trusted publishing and remove the publish-token fallback so npm publish no longer falls back to `EOTP`
+- Fix: Restore checkout in the publish job so version-verification scripts and repository metadata remain available after downloading the package artifact
+- Chore: Extract a shared workflow `lark-openapi-checks.yml` so `CI` and `Publish npm Package` reuse the same package checks
+- Chore: Run the publish job on Node 24 and publish from the artifact produced by the shared checks workflow
 - Chore: Sync the root README, package README, CI guide, and task docs with the updated release path
 
 # 0.5.4
