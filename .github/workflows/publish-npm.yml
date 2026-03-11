@@ -49,6 +49,11 @@ jobs:
         shell: bash
         working-directory: lark-openapi-mcp
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.release_ref || github.ref }}
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:

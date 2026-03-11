@@ -1,3 +1,10 @@
+# 0.5.8
+- Fix: 在 publish job 中恢复 checkout，确保版本校验脚本与仓库元数据在 artifact 下载后的发布阶段仍可用
+- Chore: 持续验证共享 checks + 纯 OIDC trusted publishing 的真实发包链路
+
+- Fix: Restore checkout in the publish job so version-verification scripts and repository metadata remain available after downloading the package artifact
+- Chore: Continue validating the real publish pipeline with shared checks plus pure OIDC trusted publishing
+
 # 0.5.7
 - Fix: 移除 publish job 中多余的 `npm install -g npm@latest` 步骤，避免在 artifact 下载前因为工作目录不存在而提前失败
 - Chore: 继续沿用纯 OIDC trusted publishing 与共享 checks workflow，验证真实发包链路
