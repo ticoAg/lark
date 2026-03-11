@@ -5,7 +5,7 @@ slug: monorepo-release-and-docs
 status: done
 deps: [05, 06]
 owner: ticoag
-updated: 2026-03-11T19:11+08:00
+updated: 2026-03-11T11:42+08:00
 ---
 
 # 里程碑 07 - Monorepo 发布与文档收口
@@ -58,3 +58,4 @@ updated: 2026-03-11T19:11+08:00
 - 2026-03-11：根据 npm 官方 trusted publishing 文档，将 publish workflow 收口为纯 OIDC：去掉 publish token fallback，publish job 切到 Node 24，并补充 package `publishConfig` 与文档说明；后续以新 tag 验证是否彻底摆脱 `EOTP`。
 - 2026-03-11：新增共享 workflow `lark-openapi-checks.yml`，让 `CI` 与 `Publish npm Package` 复用同一套 package checks 实现；publish workflow 通过 artifact 承接已校验构建产物，减少 workflow 实现层面的重复。
 - 2026-03-11：连续用 `0.5.6` / `0.5.7` / `0.5.8` 验证纯 OIDC 发布路径，依次清掉 publish job 自身的工作目录与脚本依赖问题；在 `0.5.8` 中已成功触达真实 `npm publish`，当前剩余阻塞收敛为 npm trusted publisher / package permission 侧的 `E404`。
+- 2026-03-11：按 `0.5.5` 口径通过 `workflow_dispatch` 成功发布；根因确认是 npm Trusted Publisher 中 GitHub 仓库大小写不匹配，修正为 `ticoAg/lark` 后，`Publish npm Package` 运行 `22935498185` 已成功完成 OIDC publish。

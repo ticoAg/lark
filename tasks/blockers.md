@@ -1,6 +1,6 @@
 ---
 schema: lark-blockers-v1
-updated: 2026-03-11T19:11+08:00
+updated: 2026-03-11T11:42+08:00
 ---
 
 # 活跃阻塞项（Blockers）
@@ -11,4 +11,4 @@ updated: 2026-03-11T19:11+08:00
 
 | id | status | since | owner | milestone | note |
 |---|---|---|---|---|---|
-| npm-trusted-publisher-404 | open | 2026-03-11 19:08 +08:00 | ticoag | 07 | `Publish npm Package` 运行 `22934778508` 已在纯 OIDC 路径下真正执行 `npm publish --provenance --access public`，但 npm 最终返回 `E404` / `could not be found or you do not have permission to access it`；workflow 自身问题已排除，需回到 npm 后台复核 `@ticoag/lark-mcp` 的 trusted publisher 绑定与 package 权限。 |
+| npm-trusted-publisher-404 | closed | 2026-03-11 11:30 +08:00 | ticoag | 07 | 根因确认是 npm 后台 Trusted Publisher 中 GitHub 仓库大小写与实际仓库不一致。修正为 `ticoAg/lark` 后，`workflow_dispatch` 运行 `22935498185` 已成功通过 OIDC 发布 `@ticoag/lark-mcp@0.5.5`。 |

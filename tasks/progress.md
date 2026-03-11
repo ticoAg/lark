@@ -1,6 +1,6 @@
 ---
 schema: lark-progress-v1
-updated: 2026-03-11T19:11:00+08:00
+updated: 2026-03-11T11:42:00+08:00
 focus: completed
 active: []
 blockers: []
@@ -12,11 +12,17 @@ blockers: []
 
 - 当前 focus：全部活跃里程碑已完成
 - 并行 active：无
-- 最近完成：端到端验证到 `0.5.8`，已经把 publish workflow 自身的 token/EOTP、工作目录、脚本缺失问题全部排除
-- 下一步：核对 npm 后台 trusted publisher 与 `@ticoag/lark-mcp` 的绑定细节，重点确认仓库/工作流映射与权限是否真正生效
-- 阻塞：`0.5.8` 的 `Publish npm Package` 已经在纯 OIDC 路径下执行到真实 `npm publish`，但 npm 仍返回 404 权限类错误，说明剩余问题在 npm trusted publisher / package permission 侧，而不是 workflow 本身
+- 最近完成：通过 `workflow_dispatch` 在 `main` 上成功发布 `@ticoag/lark-mcp@0.5.5`
+- 下一步：若继续发布新版本，沿用当前纯 OIDC + 共享 checks 的 workflow，并保持 npm Trusted Publisher 中仓库大小写与 `package.json` 完全一致
+- 阻塞：无
 
-## 2026-03-11 19:11 纯 OIDC 发布已触达真实 npm 权限错误
+## 2026-03-11 11:42 手动发布验证 trusted publishing 成功
+- 里程碑：07 Monorepo 发布与文档收口（维护）
+- 已完成：按用户要求删除 `0.5.6`～`0.5.8` 的 tag，保留 `0.5.5` 作为实验口径；将 `package.json` 与 changelog pin 回 `0.5.5`，并通过 `workflow_dispatch` 运行 `Publish npm Package`（运行 `22935498185`）在 `main` 上完成真实发布；npm registry 当前已返回 `@ticoag/lark-mcp@0.5.5`。
+- 下一步：如要继续发新版本，可在当前 `main` 上恢复版本推进，并继续用 `publish-npm.yml` 的 `workflow_dispatch` 或 tag 路径发布。
+- 阻塞 / 风险：本次成功前的关键修正是将 npm 后台 Trusted Publisher 的仓库大小写改成 `ticoAg/lark`，并让 `package.json` 中的 GitHub 地址保持同样大小写；后续若改仓库名或包元数据，需要同步维护。
+
+## 2026-03-11 11:30 纯 OIDC 发布已触达真实 npm 权限错误
 - 里程碑：07 Monorepo 发布与文档收口（维护）
 - 已完成：连续通过 `0.5.6`、`0.5.7`、`0.5.8` 三轮真实 tag 验证，逐步修复 publish workflow 自身问题：先移除多余的 `npm install -g npm@latest`，再为 publish job 恢复 checkout，最终在 `0.5.8` 的 `Publish npm Package` 运行 `22934778508` 中成功跑通共享 checks、artifact 下载、tag/version 校验，并实际执行 `npm publish --provenance --access public`。
 - 下一步：回到 npm 后台检查 `@ticoag/lark-mcp` 的 trusted publisher 绑定是否与当前 GitHub 仓库/工作流完全一致，并确认该 package 确实允许 `ticoAg/lark` 通过 OIDC 发布；必要时删除并重新创建 trusted publisher 绑定后，再发下一版本验证。
