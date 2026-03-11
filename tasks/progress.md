@@ -1,6 +1,6 @@
 ---
 schema: lark-progress-v1
-updated: 2026-03-11T11:42:00+08:00
+updated: 2026-03-11T13:49:00+08:00
 focus: completed
 active: []
 blockers: []
@@ -12,9 +12,15 @@ blockers: []
 
 - 当前 focus：全部活跃里程碑已完成
 - 并行 active：无
-- 最近完成：通过 `workflow_dispatch` 在 `main` 上成功发布 `@ticoag/lark-mcp@0.5.5`
-- 下一步：若继续发布新版本，沿用当前纯 OIDC + 共享 checks 的 workflow，并保持 npm Trusted Publisher 中仓库大小写与 `package.json` 完全一致
+- 最近完成：通过正式 tag 发布 `@ticoag/lark-mcp@0.5.6`
+- 下一步：后续继续发布时，沿用当前纯 OIDC + 共享 checks 的 workflow，并保持 npm Trusted Publisher 中仓库大小写与 `package.json` 完全一致
 - 阻塞：无
+
+## 2026-03-11 13:49 正式发布 0.5.6 成功
+- 里程碑：07 Monorepo 发布与文档收口（维护）
+- 已完成：将本轮 trusted publishing、共享 checks 与 artifact publish 的改动统一收口到 `0.5.6`；本地完成 `build`、`test:ci`、`pack:check`、`taskctl.py lint` 与 `verify_npm_release.py`；提交 `a719263` 并推送 tag `lark-openapi-mcp-v0.5.6`；远端 `Publish npm Package` 运行 `22938753555` 全部通过；npm registry 当前返回 `@ticoag/lark-mcp@0.5.6`。
+- 下一步：如后续继续推进，可从当前 `main` 直接做 `0.5.7+` 的正常发版；无需再保留临时实验 tag 流程。
+- 阻塞 / 风险：无。
 
 ## 2026-03-11 11:42 手动发布验证 trusted publishing 成功
 - 里程碑：07 Monorepo 发布与文档收口（维护）
