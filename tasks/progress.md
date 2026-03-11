@@ -1,6 +1,6 @@
 ---
 schema: lark-progress-v1
-updated: 2026-03-11T18:23:00+08:00
+updated: 2026-03-11T18:51:00+08:00
 focus: completed
 active: []
 blockers: []
@@ -12,9 +12,21 @@ blockers: []
 
 - 当前 focus：全部活跃里程碑已完成
 - 并行 active：无
-- 最近完成：完整跑通 `0.5.5` 的本地验证、release commit、tag push 与远端 Actions 观察
-- 下一步：更换为可用于 automation 的 npm publish token，或完成 trusted publishing，无需 token fallback 也能直接发包
-- 阻塞：`Publish npm Package` 在 `0.5.5` 的真实远端发布中不再报 404，但当前 `NPM_TOKEN` 触发 npm `EOTP`，无法无人值守发布
+- 最近完成：把 `CI` / `Publish npm Package` 的重复 checks 提炼成共享 workflow，同时保留纯 OIDC 发布路径
+- 下一步：推送共享 workflow + 纯 OIDC 修复后，用新的版本 tag 再次验证 trusted publishing
+- 阻塞：当前 `0.5.5` 的 publish run 已失败且版本号已占用；需通过后续新版本验证纯 OIDC 修复
+
+## 2026-03-11 18:51 共享 CI / Publish checks
+- 里程碑：07 Monorepo 发布与文档收口（维护）
+- 已完成：新增 `.github/workflows/lark-openapi-checks.yml` 作为共享 package checks workflow，统一 `npm ci`、`build`、`test:ci`、`pack:check`；将 `.github/workflows/ci.yml` 改为复用该 workflow，并保留 `repo guardrails`；将 `.github/workflows/publish-npm.yml` 改为先跑共享 checks、上传 publish artifact，再在独立 publish job 中下载 artifact、校验版本并通过 OIDC 发包；同步更新 `ci.md`、根 `README.md` 与 `lark-openapi-mcp/README*.md` 的说明。
+- 下一步：推送后发新版本 tag，确认共享 checks 与纯 OIDC publish 一起工作正常。
+- 阻塞 / 风险：当前重构主要是“去重实现”，`push main` 与 `push tag` 仍会分别触发 `CI` 和 `Publish npm Package`；这是保留的策略冗余，不是触发误配。
+
+## 2026-03-11 18:42 切回纯 trusted publishing 路径
+- 里程碑：07 Monorepo 发布与文档收口（维护）
+- 已完成：结合 npm 官方文档与 `0.5.5` 远端日志，确认 trusted publishing 要求 npm CLI `11.5.1+` 与 Node `22.14.0+`，且 npm 会先尝试 OIDC、失败后才回退到 token；因此将 publish workflow 改为纯 OIDC 路径：移除 `Publish to npm` 的 `NODE_AUTH_TOKEN`，将 publish job Node 版本提升到 `24`，并在 `package.json` 增加 `publishConfig`；同步更新 `ci.md`、根 `README.md` 与 `lark-openapi-mcp/README*.md` 的发布说明。
+- 下一步：推送后发新版本 tag，观察 publish run 是否不再触发 `EOTP`，并能直接通过 OIDC 发布。
+- 阻塞 / 风险：npm 后台 trusted publisher 的 workflow filename 必须与 `publish-npm.yml` 完全一致；当前未再次做远端验证，仍需下一次 tag run 闭环。
 
 ## 2026-03-11 18:23 真实发版验证命中 EOTP
 - 里程碑：07 Monorepo 发布与文档收口（维护）

@@ -1,6 +1,6 @@
 ---
 schema: lark-blockers-v1
-updated: 2026-03-11T18:23+08:00
+updated: 2026-03-11T18:42+08:00
 ---
 
 # 活跃阻塞项（Blockers）
@@ -11,4 +11,4 @@ updated: 2026-03-11T18:23+08:00
 
 | id | status | since | owner | milestone | note |
 |---|---|---|---|---|---|
-| npm-publish-eotp | open | 2026-03-11 18:20 +08:00 | ticoag | 07 | `Publish npm Package` 运行 `22933555027` 已验证 404 问题消失，但 GitHub Secret `NPM_TOKEN` 在 npm publish 时触发 `EOTP`；需改用 automation/granular publish token，或完成 trusted publishing 绑定后取消对 token 的依赖。 |
+| npm-publish-eotp | open | 2026-03-11 18:20 +08:00 | ticoag | 07 | `Publish npm Package` 运行 `22933555027` 已验证 404 问题消失，但 publish job 因 Node 20 / npm 10 未满足 trusted publishing 运行时要求而回退到 `NPM_TOKEN`，最终触发 `EOTP`；已改为纯 OIDC + Node 24，待下一个 tag run 验证。 |

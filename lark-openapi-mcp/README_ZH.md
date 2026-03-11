@@ -247,7 +247,7 @@ npx -y @ticoag/lark-mcp login -a cli_xxxx -s yyyyy
 3. 推送形如 `lark-openapi-mcp-vX.Y.Z` 的 git tag
 4. 由 GitHub Actions 执行 `npm publish --provenance --access public` 发布 `@ticoag/lark-mcp`
 
-发布 workflow 默认优先使用 npm trusted publishing；请在 npm 后台为 `@ticoag/lark-mcp` 绑定 GitHub 仓库 `ticoag/lark` 与 workflow `.github/workflows/publish-npm.yml`。若仓库已配置 `NPM_TOKEN` secret，则在 OIDC trusted publishing 尚未可用时可自动回退到 token 发布。
+发布 workflow 使用 npm trusted publishing；请在 npm 后台为 `@ticoag/lark-mcp` 绑定 GitHub 仓库 `ticoag/lark`，workflow 只填写文件名 `publish-npm.yml`，不要填写完整路径。`CI` 和 `Publish npm Package` 通过 `.github/workflows/lark-openapi-checks.yml` 共享包校验逻辑；publish job 下载已校验的 artifact，使用 Node 24 并升级到最新 npm 后再通过 OIDC 发布。若仓库需要安装私有依赖，请仅在 `npm ci` 等安装步骤使用单独的只读 token；`npm publish` 本身应依赖 OIDC，而不是 `NPM_TOKEN`。
 
 ## 常见问题
 

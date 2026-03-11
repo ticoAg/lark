@@ -1,3 +1,12 @@
+# 0.5.6
+- Fix: 切回纯 OIDC trusted publishing，移除 publish token fallback，避免 npm publish 回退到 `EOTP`
+- Chore: 抽取共享 workflow `lark-openapi-checks.yml`，让 `CI` 与 `Publish npm Package` 复用同一套 package checks
+- Chore: 将 publish job 提升到 Node 24 并升级最新 npm CLI，以满足 npm trusted publishing 运行时要求
+
+- Fix: Return to pure OIDC trusted publishing and remove the publish-token fallback so npm publish no longer falls back to `EOTP`
+- Chore: Extract a shared workflow `lark-openapi-checks.yml` so `CI` and `Publish npm Package` reuse the same package checks
+- Chore: Move the publish job to Node 24 and upgrade npm CLI to satisfy npm trusted publishing runtime requirements
+
 # 0.5.5
 - Fix: npm 发布 workflow 在 `Publish to npm` 步骤增加 `NPM_TOKEN` fallback，覆盖 trusted publishing 首发包或 OIDC 尚未就绪场景
 - Chore: 同步根 README、包 README、CI 指南与任务文档中的发布说明

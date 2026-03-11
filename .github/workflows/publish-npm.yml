@@ -29,8 +29,18 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  checks:
+    if: github.repository == 'ticoag/lark'
+    uses: ./.github/workflows/lark-openapi-checks.yml
+    with:
+      checkout_ref: ${{ github.event.inputs.release_ref || github.ref }}
+      node_version: "24"
+      upload_package_artifact: true
+      artifact_name: lark-openapi-mcp-package
+
   publish:
     if: github.repository == 'ticoag/lark'
+    needs: checks
     runs-on: ubuntu-latest
     env:
       NODE_OPTIONS: --max-old-space-size=4096
@@ -39,21 +49,20 @@ jobs:
         shell: bash
         working-directory: lark-openapi-mcp
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.inputs.release_ref || github.ref }}
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "24"
           registry-url: "https://registry.npmjs.org"
-          cache: npm
-          cache-dependency-path: lark-openapi-mcp/package-lock.json
 
-      - name: Install dependencies
-        run: npm ci --ignore-scripts
+      - name: Update npm CLI
+        run: npm install -g npm@latest
+
+      - name: Download publishable package artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: lark-openapi-mcp-package
+          path: lark-openapi-mcp
 
       - name: Verify release version from tag
         if: github.event_name == 'push'
@@ -63,21 +72,10 @@ jobs:
         if: github.event_name == 'workflow_dispatch' && github.event.inputs.expected_version != ''
         run: python3 ../scripts/verify_npm_release.py --package package.json --expected-version "${{ github.event.inputs.expected_version }}"
 
-      - name: Build
-        run: npm run build
-
-      - name: Test
-        run: npm run test:ci
-
-      - name: Validate package contents
-        run: npm run pack:check
-
       - name: Publish dry run
         if: github.event_name == 'workflow_dispatch' && github.event.inputs.dry_run == 'true'
         run: npm publish --dry-run --access public --ignore-scripts
 
       - name: Publish to npm
         if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && github.event.inputs.dry_run != 'true')
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: npm publish --provenance --access public --ignore-scripts

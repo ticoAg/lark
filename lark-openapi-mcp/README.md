@@ -250,7 +250,7 @@ Release flow:
 3. Push a git tag named `lark-openapi-mcp-vX.Y.Z`
 4. Let GitHub Actions publish `@ticoag/lark-mcp` with `npm publish --provenance --access public`
 
-The publish workflow prefers npm trusted publishing for `@ticoag/lark-mcp` against the GitHub repository `ticoag/lark` and workflow `.github/workflows/publish-npm.yml`. If the repository defines an `NPM_TOKEN` secret, the publish step can fall back to token auth when OIDC trusted publishing is not yet available.
+The publish workflow uses npm trusted publishing for `@ticoag/lark-mcp` against the GitHub repository `ticoag/lark` and workflow `.github/workflows/publish-npm.yml`. On npmjs.com, configure the trusted publisher with the workflow filename `publish-npm.yml` (filename only, not the full path). CI and publish share the package validation logic through `.github/workflows/lark-openapi-checks.yml`; the publish job downloads the checked artifact, runs on Node 24, upgrades npm to the latest CLI, and then publishes via OIDC. If you need authentication for private dependencies, use a separate read-only token only for `npm ci`; `npm publish` itself should rely on OIDC.
 
 ## FAQ
 

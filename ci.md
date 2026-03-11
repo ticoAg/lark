@@ -36,6 +36,7 @@
 
 - CI：`.github/workflows/ci.yml`
 - 发布：`.github/workflows/publish-npm.yml`
+- 共享校验：`.github/workflows/lark-openapi-checks.yml`
 
 ### 3. 版本与 tag 规则
 
@@ -51,9 +52,11 @@
 - GitHub 仓库：`ticoag/lark`
 - workflow：`.github/workflows/publish-npm.yml`
 - 正式发布命令：`npm publish --provenance --access public`
-- `Publish to npm` 步骤默认优先走 GitHub OIDC trusted publishing；若仓库配置了 `NPM_TOKEN` secret，则 npm CLI 可在 OIDC 不可用时回退到 token
+- `Publish to npm` 步骤应走 GitHub OIDC trusted publishing，不再依赖 publish token
+- npm 官方当前要求 trusted publishing 至少使用 npm CLI `11.5.1+` 与 Node `22.14.0+`；本仓 publish workflow 使用 Node `24`
+- `CI` 与 `Publish npm Package` 共享 `lark-openapi-checks.yml` 中的 `npm ci` / `build` / `test:ci` / `pack:check` 逻辑；publish workflow 在 checks job 通过后下载 artifact 再执行真正的 `npm publish`
 
-建议保留一个仓库级 `NPM_TOKEN` 作为首发包 / trusted publishing 尚未完全配置时的 bootstrap fallback；后续仍以 trusted publishing 为默认路径。
+如需安装私有 npm 依赖，只在 `npm ci` 等安装步骤注入只读 token；不要在 `npm publish` 步骤注入 publish token。
 
 ### 5. GitHub Actions Node 内存
 
@@ -104,15 +107,11 @@
    - `contents: read`
    - `id-token: write`
 4. 发布前仍执行：
+   - 共享 checks workflow（内部执行 `npm run build` / `npm run test:ci` / `npm run pack:check`）
    - 版本校验
-   - `npm run build`
-   - `npm run test:ci`
-   - `npm run pack:check`
 5. 正式发布仍使用：
    - `npm publish --provenance --access public`
-6. 若需覆盖首发包或 npm trusted publishing 临时未就绪场景：
-   - `Publish to npm` 步骤仍优先使用 OIDC
-   - 仓库 secret `NPM_TOKEN` 存在时可自动回退到 token 发布
+6. `Publish to npm` 步骤不应注入 publish token；若仓库有私有依赖，只在安装阶段注入只读 token
 
 ## 本地验证命令
 
@@ -146,9 +145,10 @@ python3 scripts/verify_npm_release.py \
 2. 更新 `lark-openapi-mcp/CHANGELOG.md`
 3. 运行本地验证
 4. 提交代码
-5. 如是首发包或 npm 后台 trusted publishing 尚未完全配置，先在 GitHub 仓库配置 `NPM_TOKEN` secret 作为 fallback
-6. 创建并推送 tag：`lark-openapi-mcp-vX.Y.Z`
-7. 等待 GitHub Actions 发布到 npm
+5. 确认 npm 后台 trusted publisher 已绑定 `publish-npm.yml`（只填文件名，不填路径）
+6. 如需安装私有依赖，额外准备只读 `NPM_READ_TOKEN` 给安装步骤使用；publish 步骤不需要 `NPM_TOKEN`
+7. 创建并推送 tag：`lark-openapi-mcp-vX.Y.Z`
+8. 等待 GitHub Actions 发布到 npm
 
 ## 文档同步要求
 

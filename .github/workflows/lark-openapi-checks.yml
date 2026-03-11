@@ -1,0 +1,77 @@
+name: Lark OpenAPI Checks
+
+on:
+  workflow_call:
+    inputs:
+      checkout_ref:
+        description: "Git ref to check out before running package checks"
+        required: false
+        default: ""
+        type: string
+      node_version:
+        description: "Node.js version used for package checks"
+        required: false
+        default: "20"
+        type: string
+      upload_package_artifact:
+        description: "Upload a publishable package artifact after checks"
+        required: false
+        default: false
+        type: boolean
+      artifact_name:
+        description: "Artifact name used when upload_package_artifact is true"
+        required: false
+        default: "lark-openapi-mcp-package"
+        type: string
+
+jobs:
+  lark-openapi-mcp:
+    name: lark-openapi-mcp build and test
+    runs-on: ubuntu-latest
+    env:
+      NODE_OPTIONS: --max-old-space-size=4096
+    defaults:
+      run:
+        shell: bash
+        working-directory: lark-openapi-mcp
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.checkout_ref || github.sha }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ inputs.node_version }}
+          cache: npm
+          cache-dependency-path: lark-openapi-mcp/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci --ignore-scripts
+
+      - name: Build
+        run: npm run build
+
+      - name: Test
+        run: npm run test:ci
+
+      - name: Validate package contents
+        run: npm run pack:check
+
+      - name: Upload publishable package artifact
+        if: inputs.upload_package_artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ inputs.artifact_name }}
+          path: |
+            lark-openapi-mcp/package.json
+            lark-openapi-mcp/package-lock.json
+            lark-openapi-mcp/CHANGELOG.md
+            lark-openapi-mcp/README.md
+            lark-openapi-mcp/README_ZH.md
+            lark-openapi-mcp/README_RECALL.md
+            lark-openapi-mcp/README_RECALL_ZH.md
+            lark-openapi-mcp/LICENSE
+            lark-openapi-mcp/docs/**
+            lark-openapi-mcp/dist/**
