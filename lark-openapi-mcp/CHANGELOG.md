@@ -1,3 +1,10 @@
+# 0.5.7
+- Fix: 移除 publish job 中多余的 `npm install -g npm@latest` 步骤，避免在 artifact 下载前因为工作目录不存在而提前失败
+- Chore: 继续沿用纯 OIDC trusted publishing 与共享 checks workflow，验证真实发包链路
+
+- Fix: Remove the extra `npm install -g npm@latest` step from the publish job so it no longer fails before the artifact download due to a missing working directory
+- Chore: Keep the pure OIDC trusted publishing path and shared checks workflow while re-validating the real publish pipeline
+
 # 0.5.6
 - Fix: 切回纯 OIDC trusted publishing，移除 publish token fallback，避免 npm publish 回退到 `EOTP`
 - Chore: 抽取共享 workflow `lark-openapi-checks.yml`，让 `CI` 与 `Publish npm Package` 复用同一套 package checks
