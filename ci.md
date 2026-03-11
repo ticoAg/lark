@@ -38,6 +38,12 @@
 - 发布：`.github/workflows/publish-npm.yml`
 - 共享校验：`.github/workflows/lark-openapi-checks.yml`
 
+补充约定：
+
+- `CI` 只在真正影响 `lark-openapi-mcp` 构建 / 测试 / 发布链路的改动上自动触发
+- 像 `lark-skill/`、`tasks/`、根 README 这类纯文档或工作流说明改动，默认不触发 CI
+- `workflow_dispatch` 仍保留，方便手动验证
+
 ### 3. 版本与 tag 规则
 
 - `package.json` 中的 `version` 是发布单一事实来源
@@ -94,6 +100,7 @@
    - `npm run pack:check`
 4. 根目录的 `scripts/taskctl.py lint` 仍然可运行
 5. 没有把 publish 逻辑混到普通 CI workflow
+6. docs-only / skill-only / tasks-only 变更不会触发普通 CI
 
 ## 修改发布流程时的检查清单
 

@@ -4,7 +4,7 @@
 >
 > Development based on / fork source: `whatevertogo/FeiShuSkill`
 
-> 面向飞书 / Feishu / Lark 的命令式 MCP Skill，默认通过 `ls` / `help` / `run` / `explain` 操作文档、云空间、消息、权限、任务、日历等能力。
+> 面向飞书 / Feishu / Lark 的命令式 MCP Skill，默认通过 `ls` / `help` / `run` / `explain` 操作文档、知识库、云空间、消息、权限、用户/通讯录、任务、日历、审批、考勤等能力。
 
 ## 前置准备
 
@@ -42,6 +42,27 @@
 - `perm permission-member transfer-owner`
 - `task task create`
 - `calendar calendar-event create`
+
+## 参考页导航
+
+这批 reference 经过重新筛选，标准是：是否能帮助 agent 更好理解“当前 monorepo 里的飞书接入和使用方式”。因此保留了权限、限制、典型工作流、常见坑和状态字段说明，但不把不适配本仓的 NestJS 模块模板或内部 CLI 作为默认入口。
+
+| 主题 | 参考页 | 适用时机 |
+| --- | --- | --- |
+| 文档 | `lark-mcp/reference/documents.md` | 搜索、导入、读写文档、Block 结构 |
+| 知识库 | `lark-mcp/reference/wiki.md` | 搜 Wiki、列空间、处理 `node_token` / `obj_token` |
+| 云空间 | `lark-mcp/reference/drive.md` | 建文件夹、列目录、移动/删除文件 |
+| 权限 | `lark-mcp/reference/permissions.md` | 授权、查协作者、转所有者 |
+| 消息 | `lark-mcp/reference/messages.md` | 文本/富文本/卡片消息 |
+| 群组 | `lark-mcp/reference/groups.md` | 建群、查群、查成员 |
+| 多维表格 | `lark-mcp/reference/bitable.md` | Base、表、字段、记录 |
+| 用户/通讯录 | `lark-mcp/reference/contacts.md` | 查用户 ID、查部门、按部门拉人 |
+| 任务 | `lark-mcp/reference/tasks.md` | 任务、清单、评论、@人 |
+| 日历/会议室 | `lark-mcp/reference/calendar.md` | 事件、忙闲、会议室 |
+| 审批 | `lark-mcp/reference/approval.md` | 发起审批、处理待办 |
+| 考勤 | `lark-mcp/reference/attendance.md` | 打卡、补卡、考勤组 |
+| OAuth | `lark-mcp/reference/oauth.md` | 只在需要理解用户授权时阅读 |
+| 事件订阅 | `lark-mcp/reference/events.md` | 只在需要理解长连接事件/卡片回调时阅读 |
 
 ## 身份策略
 
@@ -211,6 +232,22 @@ args:
       timestamp: "1762400400"
     end_time:
       timestamp: "1762404000"
+
+### 示例 8：先查用户 ID 再去任务评论 @ 人
+
+```yaml
+# Step 1
+command: "user"
+resource: "user"
+action: "lookup-id"
+identity: "tenant"
+
+# Step 2
+command: "task"
+resource: "comment"
+action: "create"
+identity: "user"
+```
 ```
 
 ## 常见问题

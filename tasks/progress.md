@@ -1,6 +1,6 @@
 ---
 schema: lark-progress-v1
-updated: 2026-03-11T13:49:00+08:00
+updated: 2026-03-11T21:52:00+08:00
 focus: completed
 active: []
 blockers: []
@@ -12,9 +12,27 @@ blockers: []
 
 - 当前 focus：全部活跃里程碑已完成
 - 并行 active：无
-- 最近完成：通过正式 tag 发布 `@ticoag/lark-mcp@0.5.6`
-- 下一步：后续继续发布时，沿用当前纯 OIDC + 共享 checks 的 workflow，并保持 npm Trusted Publisher 中仓库大小写与 `package.json` 完全一致
+- 最近完成：优化 docs-only 提交的 GitHub Actions 触发条件
+- 下一步：如后续再引入新的 package / workflow，需要继续同步维护 CI 的 path 过滤规则，避免回到“全仓文档改动也跑完整 package checks”
 - 阻塞：无
+
+## 2026-03-11 21:52 收窄 docs-only 场景的 CI 触发范围
+- 里程碑：07 Monorepo 发布与文档收口（维护）
+- 已完成：更新 `.github/workflows/ci.yml`，仅在影响 `lark-openapi-mcp` 构建 / 测试 / 发布链路的改动上自动触发 CI；像 `lark-skill/`、`tasks/`、根 README 这类纯文档提交默认不再跑普通 CI。同步更新 `README.md`、`ci.md` 与里程碑记录，明确“无代码变更时无需 CI，也不应走 npm 发版”。
+- 下一步：如果后续把更多可发布产物纳入 monorepo，需要重新评估 CI 触发路径，而不是继续沿用当前仅针对 `lark-openapi-mcp` 的范围。
+- 阻塞 / 风险：`workflow_dispatch` 仍保留，便于人工验证；如果未来某些非 `src/tests/package.json` 文件也开始影响 build/test，需要记得把对应路径加入 CI trigger。
+
+## 2026-03-11 21:38 补充 Codex 的 MCP 配置说明
+- 里程碑：07 Monorepo 发布与文档收口（维护）
+- 已完成：在 `lark-openapi-mcp/README.md`、`README_ZH.md` 与配置指南中新增 Codex 配置示例，明确 `~/.codex/config.toml` 的 TOML 写法、OAuth 版本示例以及推荐使用 server key `lark` 以保持 `mcp__lark__*` 工具名前缀稳定；同时在根 `README.md` 补了快速跳转说明。
+- 下一步：如后续支持更多 client，可继续按同样模式补“客户端专属配置”段落，而不是只保留通用 JSON 示例。
+- 阻塞 / 风险：无。
+
+## 2026-03-11 20:52 收口飞书参考资料到 lark-skill
+- 里程碑：05 Skill 与文档收束（维护）
+- 已完成：基于 `/Users/ticoag/Downloads/skills/feishu` 重新筛选“对 agent 理解当前仓飞书接入有帮助”的内容；保留权限、限制、典型工作流、状态码/字段说明，新增 `approval`、`attendance`、`calendar`、`contacts`、`drive`、`wiki`、`oauth`、`events` 等参考页；在 `SKILL.md` 与 `lark-skill/README.md` 中增加这些入口；并在已有 `documents/messages/permissions/bitable` 参考页顶部补充“当前项目请优先走 facade target”的说明。
+- 下一步：如后续真实使用中发现 agent 仍容易误走 raw tool，可继续把历史 raw 示例压缩到附录或逐步改写为 facade 示例。
+- 阻塞 / 风险：当前新增的 `oauth/events` 参考属于“飞书接入背景知识”，不是 `lark-mcp` 已直接暴露的默认 facade 能力；文档中已明确标注为高级补充。
 
 ## 2026-03-11 13:49 正式发布 0.5.6 成功
 - 里程碑：07 Monorepo 发布与文档收口（维护）

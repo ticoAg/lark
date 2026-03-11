@@ -1,5 +1,21 @@
 # 多维表格 (Bitable) 操作指南
 
+## 当前项目中的推荐入口
+
+当前项目里多维表格默认通过 `base.*` 命令层来理解和执行。优先关注：
+
+- `base.app.create`
+- `base.app.get`
+- `base.app-table.create`
+- `base.app-table.list`
+- `base.app-table-field.create`
+- `base.app-table-record.search`
+- `base.app-table-record.create`
+- `base.app-table-record.update`
+- `base.app-table-record.batch-update`
+
+下方大量示例仍保留旧的 raw 工具名写法，主要用于字段类型、过滤器和记录结构参考。真正执行时请优先使用上述 facade target。
+
 ## ⚠️ 关键注意事项
 
 **⭐ 0. 使用用户身份创建（最重要！）**

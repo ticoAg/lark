@@ -1,5 +1,19 @@
 # 权限管理指南
 
+## 当前项目中的推荐入口
+
+当前 monorepo 中与文档权限最相关的 facade target 是：
+
+- `perm.permission-member.grant`
+- `perm.permission-member.list`
+- `perm.permission-member.update`
+- `perm.permission-member.delete`
+- `perm.permission-member.transfer-owner`
+- `perm.permission-public.get`
+- `perm.permission-public.patch`
+
+如果你只是想“给谁开权限 / 转所有者 / 查当前协作者”，先从这些 target 出发。下方保留的历史示例仍有 raw 工具名，主要用于成员类型、权限类型和 token/type 对应关系参考。
+
 ## ⚠️ 关键注意事项
 
 **1. member_type 必须与 member_id 匹配**

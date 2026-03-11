@@ -5,7 +5,7 @@ slug: monorepo-release-and-docs
 status: done
 deps: [05, 06]
 owner: ticoag
-updated: 2026-03-11T13:49+08:00
+updated: 2026-03-11T21:38+08:00
 ---
 
 # 里程碑 07 - Monorepo 发布与文档收口
@@ -43,6 +43,8 @@ updated: 2026-03-11T13:49+08:00
 - 将 `lark-openapi-mcp` 的对外发包与文档口径统一到 `@ticoag/lark-mcp`，并在 README / recall 文档中明确 fork source 为 `larksuite/lark-openapi-mcp`。
 - 将 Skill 主品牌统一为 `lark-skill`，在 README / `SKILL.md` / issue reference 中改为单仓库分流，同时保留 development based on `whatevertogo/FeiShuSkill` 声明。
 - 初始化父级 git，并删除 `lark-openapi-mcp/.git`、`lark-skill/.git`、`lark-skill/.github`、`lark-skill/issue-drafts`。
+- 维护补充：为 `lark-openapi-mcp` 的 README 与配置指南补充 Codex 配置说明，新增 `~/.codex/config.toml` 的 stdio / OAuth 示例，并明确建议使用 server key `lark` 以保持工具名前缀稳定。
+- 维护补充：收窄 `.github/workflows/ci.yml` 的自动触发范围，仅在影响 `lark-openapi-mcp` 构建 / 测试 / 发布链路的改动上跑 CI；`lark-skill/`、`tasks/`、根 README 等纯文档变更默认不再触发普通 CI。
 
 ## 验证
 

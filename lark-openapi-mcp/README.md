@@ -49,9 +49,9 @@ npm -v
 
 ## Quick Start
 
-### Using with Trae/Cursor/Claude
+### Using with Trae/Cursor/Claude/Codex
 
-To integrate Feishu/Lark functionality in AI tools like Trae, Cursor or Claude, install using the button below.
+To integrate Feishu/Lark functionality in AI tools like Trae, Cursor, Claude, or Codex, install using the button below or add the server manually in your client config.
 
 [![Install MCP Server](https://cursor.com/deeplink/mcp-install-light.svg)](https://cursor.com/install-mcp?name=lark-mcp&config=eyJjb21tYW5kIjoibnB4IiwiYXJncyI6WyIteSIsIkBsYXJrc3VpdGVvYXBpL2xhcmstbWNwIiwibWNwIiwiLWEiLCJ5b3VyX2FwcF9pZCIsIi1zIiwieW91cl9hcHBfc2VjcmV0Il19)
 
@@ -77,6 +77,28 @@ or add the following to your configuration file:
   }
 }
 ```
+
+If you are using Codex CLI / Codex App, add the MCP server to `~/.codex/config.toml`:
+
+```toml
+[mcp_servers.lark]
+command = "npx"
+args = [
+  "-y",
+  "@ticoag/lark-mcp",
+  "mcp",
+  "-a",
+  "<your_app_id>",
+  "-s",
+  "<your_app_secret>",
+]
+```
+
+Notes:
+
+- We recommend using `lark` as the server key so Codex exposes tools as `mcp__lark__ls`, `mcp__lark__help`, `mcp__lark__run`, and `mcp__lark__explain`
+- If you use a different key, the Codex tool prefix will change accordingly
+- Restart Codex or reload MCP config after editing `~/.codex/config.toml`
 
 If you need to access APIs with **user identity**, you need to login first using the login command in the terminal. Note that you need to configure the application's redirect URL in the developer console first, default is http://localhost:3000/callback
 
@@ -111,6 +133,25 @@ Then add the following to your configuration file:
     }
   }
 }
+```
+
+If you are using Codex, write the same OAuth arguments into `~/.codex/config.toml`:
+
+```toml
+[mcp_servers.lark]
+command = "npx"
+args = [
+  "-y",
+  "@ticoag/lark-mcp",
+  "mcp",
+  "-a",
+  "<your_app_id>",
+  "-s",
+  "<your_app_secret>",
+  "--oauth",
+  "--token-mode",
+  "user_access_token",
+]
 ```
 
 Note: When enabling `--oauth`, it's recommended to explicitly set `--token-mode` to `user_access_token`, which means calling APIs with user access tokens, suitable for accessing user resources or scenarios requiring user authorization (such as reading personal documents, sending IM messages). If you keep the default `auto`, some APIs AI may fallback to `tenant_access_token`, which could result in insufficient permissions or inability to access user private data.

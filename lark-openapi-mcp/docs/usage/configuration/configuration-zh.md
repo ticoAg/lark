@@ -76,6 +76,29 @@ npm -v
 }
 ```
 
+**方式三：在 Codex 中配置 `~/.codex/config.toml`**
+
+如果你使用的是 Codex CLI / Codex App，建议写成下面的 TOML：
+
+```toml
+[mcp_servers.lark]
+command = "npx"
+args = [
+  "-y",
+  "@ticoag/lark-mcp",
+  "mcp",
+  "-a",
+  "your_app_id",
+  "-s",
+  "your_app_secret",
+]
+```
+
+说明：
+
+- 建议 server key 使用 `lark`，这样 Codex 中的工具名前缀会是 `mcp__lark__ls` / `help` / `run` / `explain`
+- 修改后需要重启 Codex 或重新加载 MCP 配置
+
 ### 特点说明
 
 - ✅ **配置简单**：只需要提供 App ID 和 App Secret
@@ -129,6 +152,25 @@ npx -y @ticoag/lark-mcp login -a cli_xxxx -s your_secret
     }
   }
 }
+```
+
+如果你使用的是 Codex，对应配置如下：
+
+```toml
+[mcp_servers.lark]
+command = "npx"
+args = [
+  "-y",
+  "@ticoag/lark-mcp",
+  "mcp",
+  "-a",
+  "cli_xxxx",
+  "-s",
+  "your_secret",
+  "--oauth",
+  "--token-mode",
+  "user_access_token",
+]
 ```
 
 ### 特点说明

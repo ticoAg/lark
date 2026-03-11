@@ -11,6 +11,8 @@ description: 集成飞书/Feishu 服务，优先通过命令式 MCP facade 操�
 
 Development based on / fork source：`whatevertogo/FeiShuSkill`
 
+补充说明：本仓已收口一批来自 `/Users/ticoag/Downloads/skills/feishu` 的飞书参考资料，但筛选标准不是“飞书相关就全收”，而是“是否帮助 agent 理解当前 monorepo 中的飞书接入与使用方式”。因此保留了权限、限制、工作流、字段结构、常见坑等知识，去掉了 NestJS 模块模板、内部 CLI / 插件依赖和不适配本仓默认路径的脚手架。
+
 ## 核心规则
 
 ### 1. 统一走 4 个工具
@@ -124,9 +126,11 @@ Development based on / fork source：`whatevertogo/FeiShuSkill`
 | 文档 / 知识库 | `doc` / `wiki` | 搜索、导入、读取文档；搜索 Wiki 节点 | 优先 `user` |
 | 云空间 / 权限 | `drive` / `perm` | 创建文件夹、授权、转移所有者 | 优先 `user` |
 | 消息 / 群组 | `chat` / `group` | 发消息、建群、查群、查群成员 | 发消息多为 `tenant`，查群或用户相关可先看 `help` |
+| 用户 / 通讯录 | `user` | 查用户 ID、查用户详情、按部门列成员、找部门 | 先看 `help`；很多能力是 `user_preferred` 或 `tenant_only` |
 | 多维表格 | `base` | 建 Base、建表、查记录、写记录 | 优先 `user` |
 | 任务 / 清单 / 评论 | `task` | 建任务、建任务清单、建任务分组、评论任务、删任务 | 优先 `user` |
 | 日历 | `calendar` | 建事件、改事件、查忙闲 | 优先 `user` |
+| 审批 / 考勤 | `approval` / `attendance` | 发起审批、处理审批、查考勤、查补卡、查考勤组 | 审批/考勤常更偏 `tenant` |
 
 ### 文档 / 知识库
 
@@ -153,6 +157,7 @@ Development based on / fork source：`whatevertogo/FeiShuSkill`
 **进一步细节**
 
 - 需要 `docs_types`、分页、按 owner/chat 过滤等细项时，再看 `reference/documents.md`
+- 需要 Wiki 节点与实际文档对象的对应关系时，再看 `reference/wiki.md`
 
 ### 云空间 / 权限
 
@@ -178,6 +183,7 @@ Development based on / fork source：`whatevertogo/FeiShuSkill`
 
 **进一步细节**
 
+- 需要目录 token、父目录限制和文件移动/删除时，再看 `reference/drive.md`
 - 需要判断 token 与 `type` 的对应关系、授权对象 ID 类型时，再看 `reference/permissions.md`
 
 ### 消息 / 群组
@@ -207,6 +213,29 @@ Development based on / fork source：`whatevertogo/FeiShuSkill`
 **进一步细节**
 
 - 需要复杂富文本、卡片结构、群主/管理员细项时，再看 `reference/messages.md` 和 `reference/groups.md`
+
+### 用户 / 通讯录
+
+**高频动作**
+
+- `user.user.lookup-id`：按邮箱/手机号/其他标识换用户 ID；适合“我要 @ 某人/给某人授权，但只有邮箱或手机号”
+- `user.user.get`：查用户详情；适合“确认此人的 open_id / 部门 / employee_id”
+- `user.user.find-by-department`：列部门成员；适合“找某部门所有人”
+- `user.department.search`：按名字找部门；适合“只有部门名，不知道部门 ID”
+
+**高频选项**
+
+- `user_id_type`：通常优先 `open_id`
+- `department_id_type`：部门 ID 类型必须和真实 ID 匹配
+
+**何时这样选**
+
+- 任务评论 `@人`、发消息 `@人`、授权给某人之前，优先先把用户 ID 找准
+- 用户只给你一个“市场部 / 产品部”，先找部门，再拉人
+
+**进一步细节**
+
+- 见 `reference/contacts.md`
 
 ### 多维表格
 
@@ -292,6 +321,47 @@ Development based on / fork source：`whatevertogo/FeiShuSkill`
 - 用户说“约个会/建个日程”时，用 `calendar.calendar-event.create`
 - 用户说“帮我改时间/延期”时，用 `calendar.calendar-event.patch`
 - 用户说“看某人这段时间是否有空”时，用 `calendar.freebusy.list`
+
+**进一步细节**
+
+- 需要会议室搜索、参与人、主日历、时间戳格式时，再看 `reference/calendar.md`
+
+### 审批 / 考勤
+
+**高频动作**
+
+- `approval.instance.create`：发起审批
+- `approval.task.search` / `approval.task.query`：查审批待办
+- `approval.task.approve` / `reject` / `transfer`：处理审批
+- `attendance.user-task.query`：查考勤
+- `attendance.user-task-remedy.query`：查补卡
+- `attendance.group.get`：查考勤组
+
+**高频选项**
+
+- 审批常需要业务方给出 `approval_code`
+- 考勤常需要 `employee_id`
+
+**何时这样选**
+
+- 只要出现审批流或待办处理，先去 `approval`
+- 只要出现打卡、迟到、补卡、考勤组，先去 `attendance`
+
+**进一步细节**
+
+- 见 `reference/approval.md` 和 `reference/attendance.md`
+
+### 高级补充
+
+以下内容不是当前仓默认的 MCP facade 使用主路径，但在理解飞书接入时有帮助：
+
+- `reference/oauth.md`
+- `reference/events.md`
+
+适用：
+
+- 用户明确在问 user OAuth 授权
+- 用户明确在问长连接事件、卡片点击回调、交互卡片更新
 
 ## 常用判断模板
 

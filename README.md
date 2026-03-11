@@ -47,6 +47,12 @@ npx -y @ticoag/lark-mcp login -a <app_id> -s <app_secret>
 - `lark-openapi-mcp/README_ZH.md`
 - `lark-openapi-mcp/docs/usage/configuration/configuration.md`
 
+如果你使用 Codex：
+
+- 把 `lark-mcp` 写入 `~/.codex/config.toml`
+- 推荐使用 server key `lark`，这样工具名前缀会是 `mcp__lark__ls` / `help` / `run` / `explain`
+- 可直接参考 `lark-openapi-mcp/README_ZH.md` 和 `lark-openapi-mcp/docs/usage/configuration/configuration-zh.md` 中新增的 Codex 配置示例
+
 ### 2. 使用 Skill
 
 将 `lark-skill/lark-mcp/SKILL.md` 作为配套 Skill 使用。默认工作流是：
@@ -87,6 +93,7 @@ npx -y @ticoag/lark-mcp login -a <app_id> -s <app_secret>
 
 - CI workflow：`.github/workflows/ci.yml`
   - 对 `lark-openapi-mcp` 执行 `npm ci`、`npm run build`、`npm run test:ci`、`npm run pack:check`
+  - 仅在影响 `lark-openapi-mcp` 构建 / 测试 / 发布链路的改动上自动触发；`lark-skill/`、`tasks/`、根 README 等纯文档改动默认不跑 CI
   - GitHub Actions 会为 `lark-openapi-mcp` job 注入 `NODE_OPTIONS=--max-old-space-size=4096`，避免 `tsc` 在默认堆上限下 OOM
   - 对工作区任务文档执行 `python3 scripts/taskctl.py lint`
 - npm 发布 workflow：`.github/workflows/publish-npm.yml`

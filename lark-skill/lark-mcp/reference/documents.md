@@ -1,5 +1,28 @@
 # 文档操作指南
 
+## 当前项目中的推荐入口
+
+本文件保留了很多细节化的参数说明，但在当前 monorepo 中，默认不要从 raw tool 名称开始思考。优先先看这些 facade target：
+
+- `doc.document.search`
+- `doc.document.import`
+- `doc.document.read-content`
+- `doc.document.create`
+- `doc.document.convert`
+- `doc.document-block.list`
+- `doc.document-block.patch`
+- `doc.document-block-children.create`
+- `doc.document-block-children.batch-delete`
+
+使用顺序建议：
+
+1. `mcp__lark__ls` 看 `doc`
+2. `mcp__lark__help` 看具体 target 和字段
+3. `mcp__lark__run` 执行
+4. 失败时用 `mcp__lark__explain`
+
+下方很多历史示例仍使用 raw 工具名，主要用于参数细节参考；真正执行时请换成上面的命令层 target。
+
 ## ⚠️ 关键注意事项
 
 **1. 搜索文档必须使用 user_access_token**

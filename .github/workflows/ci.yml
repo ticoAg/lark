@@ -2,9 +2,33 @@ name: CI
 
 on:
   pull_request:
+    paths:
+      - ".github/workflows/ci.yml"
+      - ".github/workflows/lark-openapi-checks.yml"
+      - ".github/workflows/publish-npm.yml"
+      - "lark-openapi-mcp/src/**"
+      - "lark-openapi-mcp/tests/**"
+      - "lark-openapi-mcp/package.json"
+      - "lark-openapi-mcp/package-lock.json"
+      - "lark-openapi-mcp/tsconfig.json"
+      - "lark-openapi-mcp/jest.config.js"
+      - "scripts/taskctl.py"
+      - "scripts/verify_npm_release.py"
   push:
     branches:
       - main
+    paths:
+      - ".github/workflows/ci.yml"
+      - ".github/workflows/lark-openapi-checks.yml"
+      - ".github/workflows/publish-npm.yml"
+      - "lark-openapi-mcp/src/**"
+      - "lark-openapi-mcp/tests/**"
+      - "lark-openapi-mcp/package.json"
+      - "lark-openapi-mcp/package-lock.json"
+      - "lark-openapi-mcp/tsconfig.json"
+      - "lark-openapi-mcp/jest.config.js"
+      - "scripts/taskctl.py"
+      - "scripts/verify_npm_release.py"
   workflow_dispatch:
 
 concurrency:

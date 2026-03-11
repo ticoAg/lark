@@ -76,6 +76,29 @@ Add the following content to your MCP client configuration file:
 }
 ```
 
+**Method 3: Configure Codex via `~/.codex/config.toml`**
+
+If you use Codex CLI / Codex App, add the MCP server in TOML format:
+
+```toml
+[mcp_servers.lark]
+command = "npx"
+args = [
+  "-y",
+  "@ticoag/lark-mcp",
+  "mcp",
+  "-a",
+  "your_app_id",
+  "-s",
+  "your_app_secret",
+]
+```
+
+Notes:
+
+- We recommend using `lark` as the server key so Codex exposes tools as `mcp__lark__ls` / `help` / `run` / `explain`
+- Restart Codex or reload MCP config after editing the file
+
 ### Features
 
 - ✅ **Simple Configuration**: Only requires App ID and App Secret
@@ -129,6 +152,25 @@ After login is complete, add OAuth-related parameters to the MCP client configur
     }
   }
 }
+```
+
+If you use Codex, the equivalent TOML configuration is:
+
+```toml
+[mcp_servers.lark]
+command = "npx"
+args = [
+  "-y",
+  "@ticoag/lark-mcp",
+  "mcp",
+  "-a",
+  "cli_xxxx",
+  "-s",
+  "your_secret",
+  "--oauth",
+  "--token-mode",
+  "user_access_token",
+]
 ```
 
 ### Features

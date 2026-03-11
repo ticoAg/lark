@@ -49,9 +49,9 @@
 
 ## 快速开始
 
-### 在Trae/Cursor中使用
+### 在 Trae/Cursor/Codex 中使用
 
-如需在Trae、Cursor等AI工具中集成飞书/Lark功能，你可以通过下方按钮安装，将 `app_id` 和 `app_secret` 填入安装弹窗或客户端配置 JSON 的 `args` 中：
+如需在 Trae、Cursor、Codex 等 AI 工具中集成飞书/Lark 功能，你可以通过下方按钮安装，或手动写入客户端配置。将 `app_id` 和 `app_secret` 填入安装弹窗、JSON 配置或 Codex 的 `config.toml` 即可。
 
 [![Install MCP Server](https://cursor.com/deeplink/mcp-install-light.svg)](https://cursor.com/install-mcp?name=lark-mcp&config=eyJjb21tYW5kIjoibnB4IiwiYXJncyI6WyIteSIsIkBsYXJrc3VpdGVvYXBpL2xhcmstbWNwIiwibWNwIiwiLWEiLCJ5b3VyX2FwcF9pZCIsIi1zIiwieW91cl9hcHBfc2VjcmV0Il19)
 [![Install MCP Server](./assets/trae-cn.svg)](trae-cn://trae.ai-ide/mcp-import?source=lark&type=stdio&config=eyJjb21tYW5kIjoibnB4IiwiYXJncyI6WyIteSIsIkBsYXJrc3VpdGVvYXBpL2xhcmstbWNwIiwibWNwIiwiLWEiLCJ5b3VyX2FwcF9pZCIsIi1zIiwieW91cl9hcHBfc2VjcmV0Il19)  [![Install MCP Server](./assets/trae.svg)](trae://trae.ai-ide/mcp-import?source=lark&type=stdio&config=eyJjb21tYW5kIjoibnB4IiwiYXJncyI6WyIteSIsIkBsYXJrc3VpdGVvYXBpL2xhcmstbWNwIiwibWNwIiwiLWEiLCJ5b3VyX2FwcF9pZCIsIi1zIiwieW91cl9hcHBfc2VjcmV0Il19)
@@ -77,6 +77,28 @@
   }
 }
 ```
+
+如果你使用的是 Codex CLI / Codex App，建议把 MCP server 写入 `~/.codex/config.toml`：
+
+```toml
+[mcp_servers.lark]
+command = "npx"
+args = [
+  "-y",
+  "@ticoag/lark-mcp",
+  "mcp",
+  "-a",
+  "<your_app_id>",
+  "-s",
+  "<your_app_secret>",
+]
+```
+
+说明：
+
+- 建议把 server key 写成 `lark`，这样在 Codex 里工具名前缀会是 `mcp__lark__ls`、`mcp__lark__help`、`mcp__lark__run`、`mcp__lark__explain`
+- 若你把 key 写成别的名字，Codex 中的工具前缀也会随之变化
+- 修改 `~/.codex/config.toml` 后，重启 Codex 或重新加载 MCP 配置再使用
 
 如需使用**用户身份**访问 API：
 1) 在终端运行 `login`（会保存令牌，后续客户端可直接复用）。
@@ -107,6 +129,25 @@ npx -y @ticoag/lark-mcp login -a cli_xxxx -s yyyyy
     }
   }
 }
+```
+
+如果你使用的是 Codex，则把同样的参数写进 `~/.codex/config.toml`：
+
+```toml
+[mcp_servers.lark]
+command = "npx"
+args = [
+  "-y",
+  "@ticoag/lark-mcp",
+  "mcp",
+  "-a",
+  "<your_app_id>",
+  "-s",
+  "<your_app_secret>",
+  "--oauth",
+  "--token-mode",
+  "user_access_token",
+]
 ```
 
 说明：在启用 `--oauth` 时，建议显式设置 `--token-mode` 为 `user_access_token`，表示以用户访问令牌调用 API，适用于访问用户资源或需要用户授权的场景（如读取个人文档、发送 IM 消息）。若保留默认 `auto`，可能在AI推理使用 `tenant_access_token`，导致权限不足或无法访问用户私有数据。

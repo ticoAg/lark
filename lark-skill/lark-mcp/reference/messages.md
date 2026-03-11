@@ -1,5 +1,20 @@
 # 消息发送与群组管理指南
 
+## 当前项目中的推荐入口
+
+当前项目默认通过命令层 facade 来理解消息与群组，而不是直接记 raw tool 名。优先关注这些 target：
+
+- `chat.message.create`
+- `chat.message.reply`
+- `chat.message.update`
+- `chat.message.patch`
+- `group.chat.create`
+- `group.chat.list`
+- `group.chat.search`
+- `group.chat-members.get`
+
+下方很多示例仍保留 raw 工具名和 payload 细节，这是为了说明消息内容结构与字段约束；真正执行时，请先 `help` 对应的 facade target，再把这些内容结构迁移到 `args.data` / `args.params` 中。
+
 ## ⚠️ 关键注意事项
 
 **1. content 必须是 JSON 字符串，不是对象**
