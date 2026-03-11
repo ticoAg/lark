@@ -1,15 +1,22 @@
-# 0.5.5
+# 0.5.6
 - Fix: 切回纯 OIDC trusted publishing，移除 publish token fallback，避免 npm publish 回退到 `EOTP`
 - Fix: 在 publish job 中恢复 checkout，确保版本校验脚本与仓库元数据在 artifact 下载后的发布阶段仍可用
 - Chore: 抽取共享 workflow `lark-openapi-checks.yml`，让 `CI` 与 `Publish npm Package` 复用同一套 package checks
 - Chore: publish job 使用 Node 24，并基于共享 checks artifact 执行真正的 `npm publish`
+- Fix: 统一 `package.json` 中 GitHub 仓库地址大小写为 `ticoAg/lark`，与 npm Trusted Publisher 保持严格一致
 - Chore: 同步根 README、包 README、CI 指南与任务文档中的发布说明
 
 - Fix: Return to pure OIDC trusted publishing and remove the publish-token fallback so npm publish no longer falls back to `EOTP`
 - Fix: Restore checkout in the publish job so version-verification scripts and repository metadata remain available after downloading the package artifact
 - Chore: Extract a shared workflow `lark-openapi-checks.yml` so `CI` and `Publish npm Package` reuse the same package checks
 - Chore: Run the publish job on Node 24 and publish from the artifact produced by the shared checks workflow
+- Fix: Align the GitHub repository casing in `package.json` with `ticoAg/lark` so it matches npm Trusted Publisher metadata exactly
 - Chore: Sync the root README, package README, CI guide, and task docs with the updated release path
+
+# 0.5.5
+- Chore: 以 `workflow_dispatch` 在 `main` 上完成 `@ticoag/lark-mcp@0.5.5` 的 trusted publishing 验证发布
+
+- Chore: Publish `@ticoag/lark-mcp@0.5.5` from `main` via `workflow_dispatch` as the trusted publishing verification release
 
 # 0.5.4
 - Chore: 进行 `@ticoag/lark-mcp` 的首次人工 npm 发布，为后续 trusted publishing 建立包入口
