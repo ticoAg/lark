@@ -37,7 +37,9 @@ const runSchema = {
   command: z.string().describe('Domain command, for example: "doc", "drive", "chat", "base"'),
   resource: z.string().describe('Resource name under the command tree.'),
   action: z.string().describe('Action name under the resource tree.'),
-  args: z.record(z.any()).optional().describe('Structured raw arguments forwarded to the mapped OpenAPI tool.'),
+  // Use the explicit key schema form so Zod v4's JSON Schema conversion can
+  // serialize this field during MCP `tools/list`.
+  args: z.record(z.string(), z.any()).optional().describe('Structured raw arguments forwarded to the mapped OpenAPI tool.'),
   identity: z
     .enum(['auto', 'user', 'tenant'])
     .optional()
@@ -72,6 +74,11 @@ function normalizeArgs(args: unknown): Record<string, unknown> {
   const next = { ...(args as Record<string, unknown>) };
   delete next.useUAT;
   return next;
+}
+
+function getFirstTextContent(result: CallToolResult): string | undefined {
+  const firstTextBlock = result.content?.find((item) => item.type === 'text');
+  return firstTextBlock?.text;
 }
 
 type TaskCommentMention = {
@@ -317,7 +324,8 @@ export class LarkMcpTool {
 
         logger.info(`[LarkMcpTool] Calling tool: ${tool.name}`);
         const result = await handler(this.client, { ...params, useUAT: shouldUseUAT }, { userAccessToken, tool });
-        const errorCode = safeJsonParse(result.content?.[0]?.text as string, { code: 0 }).code;
+        const resultText = getFirstTextContent(result);
+        const errorCode = safeJsonParse(resultText, { code: 0 }).code;
         if (
           result.isError &&
           [OAPI_MCP_ERROR_CODE.USER_ACCESS_TOKEN_UNAUTHORIZED, OAPI_MCP_ERROR_CODE.USER_ACCESS_TOKEN_INVALID].includes(
@@ -326,7 +334,7 @@ export class LarkMcpTool {
         ) {
           logger.info(`[LarkMcpTool] User access token unauthorized or invalid, re-authorizing, errorCode: ${errorCode}`);
           const { authorizeUrl: newAuthorizeUrl } = await this.reAuthorize();
-          return this.getReAuthorizeMessage(newAuthorizeUrl, errorCode, result.content?.[0]?.text as string);
+          return this.getReAuthorizeMessage(newAuthorizeUrl, errorCode, resultText);
         }
         return result;
       }
@@ -355,137 +363,157 @@ export class LarkMcpTool {
 
   registerMcpServer(server: McpServer, options?: { toolNameCase?: ToolNameCase }): void {
     for (const tool of this.allTools) {
-      server.tool(caseTransf(tool.name, options?.toolNameCase), tool.description, tool.schema, async (params: any) => {
-        return this.executeRawToolDefinition(tool, params);
-      });
+      server.registerTool(
+        caseTransf(tool.name, options?.toolNameCase),
+        { description: tool.description, inputSchema: tool.schema as any },
+        async (params: any) => {
+          return this.executeRawToolDefinition(tool, params);
+        },
+      );
     }
   }
 
   registerCommandMcpServer(server: McpServer, options?: { toolNameCase?: ToolNameCase }): void {
-    server.tool(caseTransf('ls', options?.toolNameCase), 'List available commands, resources, and actions.', lsSchema, async (params: any) => {
-      const payload = buildLsPayload(this.commandRegistry, params?.target);
-      return {
-        content: [{ type: 'text' as const, text: JSON.stringify(payload) }],
-      };
-    });
+    server.registerTool(
+      caseTransf('ls', options?.toolNameCase),
+      { description: 'List available commands, resources, and actions.', inputSchema: lsSchema as any },
+      async (params: any) => {
+        const payload = buildLsPayload(this.commandRegistry, params?.target);
+        return {
+          content: [{ type: 'text' as const, text: JSON.stringify(payload) }],
+        };
+      },
+    );
 
-    server.tool(caseTransf('help', options?.toolNameCase), 'Show help for a command, resource, action, or argument.', helpSchema, async (params: any) => {
-      const payload = buildHelpPayload(this.commandRegistry, params?.target, params?.field);
-      return {
-        content: [{ type: 'text' as const, text: JSON.stringify(payload) }],
-      };
-    });
+    server.registerTool(
+      caseTransf('help', options?.toolNameCase),
+      { description: 'Show help for a command, resource, action, or argument.', inputSchema: helpSchema as any },
+      async (params: any) => {
+        const payload = buildHelpPayload(this.commandRegistry, params?.target, params?.field);
+        return {
+          content: [{ type: 'text' as const, text: JSON.stringify(payload) }],
+        };
+      },
+    );
 
-    server.tool(caseTransf('run', options?.toolNameCase), 'Execute a command/resource/action against the mapped Feishu raw tool.', runSchema, async (params: any) => {
-      const spec = findCommandSpec(this.commandRegistry, {
-        command: params?.command,
-        resource: params?.resource,
-        action: params?.action,
-      });
+    server.registerTool(
+      caseTransf('run', options?.toolNameCase),
+      { description: 'Execute a command/resource/action against the mapped Feishu raw tool.', inputSchema: runSchema as any },
+      async (params: any) => {
+        const spec = findCommandSpec(this.commandRegistry, {
+          command: params?.command,
+          resource: params?.resource,
+          action: params?.action,
+        });
 
-      if (!spec) {
-        const target = [params?.command, params?.resource, params?.action].filter(Boolean).join('.');
-        const normalizedTarget = normalizeTarget(target);
-        const suggestions = this.commandRegistry
-          .filter((entry) => !normalizedTarget || entry.helpTarget.startsWith(normalizedTarget.split('.').slice(0, 2).join('.')))
-          .slice(0, 8)
-          .map((entry) => ({
-            type: 'help' as const,
-            target: entry.helpTarget,
-            reason: 'Nearby command target.',
-          }));
+        if (!spec) {
+          const target = [params?.command, params?.resource, params?.action].filter(Boolean).join('.');
+          const normalizedTarget = normalizeTarget(target);
+          const suggestions = this.commandRegistry
+            .filter((entry) => !normalizedTarget || entry.helpTarget.startsWith(normalizedTarget.split('.').slice(0, 2).join('.')))
+            .slice(0, 8)
+            .map((entry) => ({
+              type: 'help' as const,
+              target: entry.helpTarget,
+              reason: 'Nearby command target.',
+            }));
+
+          return {
+            isError: true,
+            content: [
+              {
+                type: 'text' as const,
+                text: JSON.stringify(
+                  errorEnvelope({
+                    target: normalizedTarget,
+                    error: 'Unknown command/resource/action target.',
+                    summary: 'No command action matched the requested target.',
+                    suggestions,
+                  }),
+                ),
+              },
+            ],
+          };
+        }
+
+        const identity = (params?.identity as CommandIdentityMode | undefined) ?? resolveDefaultIdentity(spec.defaultIdentity);
+        let args = normalizeArgs(params?.args);
+        const useUAT = identity === 'user' ? true : identity === 'tenant' ? false : resolveDefaultIdentity(spec.defaultIdentity) === 'user';
+        if (spec.rawToolName === 'task.v2.comment.create' && this.hasTaskCommentMentions(args)) {
+          args = this.buildV2TaskCommentArgs(args);
+        }
+        if (spec.rawToolName === 'task.v1.taskComment.create' && this.hasTaskCommentMentions(args)) {
+          args = this.buildLegacyTaskCommentArgs(args);
+        }
+        const rawResult = await this.executeRawTool(spec.rawToolName, { ...args, useUAT });
+        const parsed = parseToolResult(rawResult as any);
+
+        if (rawResult.isError) {
+          return {
+            isError: true,
+            content: [
+              {
+                type: 'text' as const,
+                text: JSON.stringify(
+                  errorEnvelope({
+                    target: spec.helpTarget,
+                    error: parsed,
+                    summary: spec.summary,
+                    suggestions: buildExplainSuggestions(spec),
+                    cite: buildCite(spec, parsed),
+                  }),
+                ),
+              },
+            ],
+          };
+        }
 
         return {
-          isError: true,
-          content: [
-            {
-              type: 'text' as const,
-              text: JSON.stringify(
-                errorEnvelope({
-                  target: normalizedTarget,
-                  error: 'Unknown command/resource/action target.',
-                  summary: 'No command action matched the requested target.',
-                  suggestions,
-                }),
-              ),
-            },
-          ],
+          content: [{ type: 'text' as const, text: JSON.stringify(successEnvelope(spec, parsed)) }],
         };
-      }
+      },
+    );
 
-      const identity = (params?.identity as CommandIdentityMode | undefined) ?? resolveDefaultIdentity(spec.defaultIdentity);
-      let args = normalizeArgs(params?.args);
-      const useUAT = identity === 'user' ? true : identity === 'tenant' ? false : resolveDefaultIdentity(spec.defaultIdentity) === 'user';
-      if (spec.rawToolName === 'task.v2.comment.create' && this.hasTaskCommentMentions(args)) {
-        args = this.buildV2TaskCommentArgs(args);
-      }
-      if (spec.rawToolName === 'task.v1.taskComment.create' && this.hasTaskCommentMentions(args)) {
-        args = this.buildLegacyTaskCommentArgs(args);
-      }
-      const rawResult = await this.executeRawTool(spec.rawToolName, { ...args, useUAT });
-      const parsed = parseToolResult(rawResult as any);
+    server.registerTool(
+      caseTransf('explain', options?.toolNameCase),
+      { description: 'Explain an error, permission issue, or target mismatch with next-step guidance.', inputSchema: explainSchema as any },
+      async (params: any) => {
+        const target = normalizeTarget(params?.target);
+        const spec = this.commandRegistry.find((entry) => entry.helpTarget === target || entry.rawToolName === params?.raw_tool);
+        const errorText = String(params?.error ?? '');
+        const errorCode = Number(params?.error_code ?? safeJsonParse(errorText, { code: 0 }).code ?? 0);
 
-      if (rawResult.isError) {
+        let summary = 'General execution guidance.';
+        if ([OAPI_MCP_ERROR_CODE.USER_ACCESS_TOKEN_INVALID, OAPI_MCP_ERROR_CODE.USER_ACCESS_TOKEN_UNAUTHORIZED].includes(errorCode)) {
+          summary = 'User token is invalid, expired, or missing required scopes.';
+        } else if (/permission|forbidden|denied|scope/i.test(errorText)) {
+          summary = 'Permission or scope issue detected.';
+        } else if (/unknown command|no command action matched/i.test(errorText)) {
+          summary = 'Target resolution issue detected.';
+        }
+
+        const payload = {
+          target: spec?.helpTarget ?? target,
+          summary,
+          raw_tool: spec?.rawToolName ?? params?.raw_tool,
+          error_code: Number.isFinite(errorCode) ? errorCode : undefined,
+          error: params?.error,
+          suggestions: spec
+            ? buildExplainSuggestions(spec)
+            : [{ type: 'help' as const, target: 'root', reason: 'Start from the root help tree.' }],
+          cite: spec
+            ? {
+                help_target: spec.helpTarget,
+                raw_tool: spec.rawToolName,
+                docs_url: spec.docsUrl,
+              }
+            : undefined,
+        };
+
         return {
-          isError: true,
-          content: [
-            {
-              type: 'text' as const,
-              text: JSON.stringify(
-                errorEnvelope({
-                  target: spec.helpTarget,
-                  error: parsed,
-                  summary: spec.summary,
-                  suggestions: buildExplainSuggestions(spec),
-                  cite: buildCite(spec, parsed),
-                }),
-              ),
-            },
-          ],
+          content: [{ type: 'text' as const, text: JSON.stringify(payload) }],
         };
-      }
-
-      return {
-        content: [{ type: 'text' as const, text: JSON.stringify(successEnvelope(spec, parsed)) }],
-      };
-    });
-
-    server.tool(caseTransf('explain', options?.toolNameCase), 'Explain an error, permission issue, or target mismatch with next-step guidance.', explainSchema, async (params: any) => {
-      const target = normalizeTarget(params?.target);
-      const spec = this.commandRegistry.find((entry) => entry.helpTarget === target || entry.rawToolName === params?.raw_tool);
-      const errorText = String(params?.error ?? '');
-      const errorCode = Number(params?.error_code ?? safeJsonParse(errorText, { code: 0 }).code ?? 0);
-
-      let summary = 'General execution guidance.';
-      if ([OAPI_MCP_ERROR_CODE.USER_ACCESS_TOKEN_INVALID, OAPI_MCP_ERROR_CODE.USER_ACCESS_TOKEN_UNAUTHORIZED].includes(errorCode)) {
-        summary = 'User token is invalid, expired, or missing required scopes.';
-      } else if (/permission|forbidden|denied|scope/i.test(errorText)) {
-        summary = 'Permission or scope issue detected.';
-      } else if (/unknown command|no command action matched/i.test(errorText)) {
-        summary = 'Target resolution issue detected.';
-      }
-
-      const payload = {
-        target: spec?.helpTarget ?? target,
-        summary,
-        raw_tool: spec?.rawToolName ?? params?.raw_tool,
-        error_code: Number.isFinite(errorCode) ? errorCode : undefined,
-        error: params?.error,
-        suggestions: spec
-          ? buildExplainSuggestions(spec)
-          : [{ type: 'help' as const, target: 'root', reason: 'Start from the root help tree.' }],
-        cite: spec
-          ? {
-              help_target: spec.helpTarget,
-              raw_tool: spec.rawToolName,
-              docs_url: spec.docsUrl,
-            }
-          : undefined,
-      };
-
-      return {
-        content: [{ type: 'text' as const, text: JSON.stringify(payload) }],
-      };
-    });
+      },
+    );
   }
 }

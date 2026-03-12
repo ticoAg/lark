@@ -1,3 +1,16 @@
+# 0.5.7
+- Fix: 将 `run` facade 的 `args` schema 改为显式 key schema 形式，修复最新 MCP SDK / Zod 组合下 `tools/list` 触发的 `_zod` 启动错误
+- Bump: 升级 `@modelcontextprotocol/sdk` 到 `1.27.1`，并同步切换到最新 `registerTool()` / `McpServer` 类型面
+- Bump: 升级 `@larksuiteoapi/node-sdk` 到 `1.59.0`
+- Chore: 显式声明 `zod@3.25.76` 为直接依赖，避免继续隐式依赖 MCP SDK 传递出来的 Zod 版本
+- Test: 更新命令层与 MCP server 相关测试，统一对齐 latest-only 的工具注册接口
+
+- Fix: Rewrite the `run` facade `args` schema to use the explicit key-schema form so the latest MCP SDK / Zod stack no longer crashes with `_zod` during `tools/list`
+- Bump: Upgrade `@modelcontextprotocol/sdk` to `1.27.1` and move the codebase to the latest `registerTool()` / `McpServer` type surface
+- Bump: Upgrade `@larksuiteoapi/node-sdk` to `1.59.0`
+- Chore: Declare `zod@3.25.76` as a direct dependency so the package no longer relies on MCP SDK's transitive Zod version
+- Test: Update command-surface and MCP server tests to the latest-only tool registration interface
+
 # 0.5.6
 - Fix: 切回纯 OIDC trusted publishing，移除 publish token fallback，避免 npm publish 回退到 `EOTP`
 - Fix: 在 publish job 中恢复 checkout，确保版本校验脚本与仓库元数据在 artifact 下载后的发布阶段仍可用

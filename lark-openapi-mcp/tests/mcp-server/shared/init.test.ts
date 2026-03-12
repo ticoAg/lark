@@ -9,7 +9,7 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 jest.mock('@modelcontextprotocol/sdk/server/mcp.js', () => ({
   McpServer: jest.fn().mockImplementation(() => ({
     connect: jest.fn().mockResolvedValue(undefined),
-    tool: jest.fn().mockImplementation((name, description, schema, handler) => {
+    registerTool: jest.fn().mockImplementation((name, config, handler) => {
       handler();
     }),
   })),

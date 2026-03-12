@@ -20,7 +20,7 @@ jest.mocked(larkOapiHandler).mockImplementation(mockLarkOapiHandler);
 
 // 模拟McpServer
 const mockServer = {
-  tool: jest.fn(),
+  registerTool: jest.fn(),
 } as unknown as McpServer;
 
 describe('LarkMcpTool', () => {
@@ -117,13 +117,21 @@ describe('LarkMcpTool', () => {
       // 基本注册
       larkMcpTool.registerMcpServer(mockServer);
       expect(caseTransf).toHaveBeenCalledWith('im.v1.message.create', undefined);
-      expect(mockServer.tool).toHaveBeenCalledWith('im_v1_message_create', '发送消息', {}, expect.any(Function));
+      expect(mockServer.registerTool).toHaveBeenCalledWith(
+        'im_v1_message_create',
+        { description: '发送消息', inputSchema: {} },
+        expect.any(Function),
+      );
 
       // 不同命名风格
       jest.clearAllMocks();
       larkMcpTool.registerMcpServer(mockServer, { toolNameCase: 'camel' });
       expect(caseTransf).toHaveBeenCalledWith('im.v1.message.create', 'camel');
-      expect(mockServer.tool).toHaveBeenCalledWith('imV1MessageCreate', '发送消息', {}, expect.any(Function));
+      expect(mockServer.registerTool).toHaveBeenCalledWith(
+        'imV1MessageCreate',
+        { description: '发送消息', inputSchema: {} },
+        expect.any(Function),
+      );
     });
 
     it('应该处理客户端未初始化错误', async () => {
@@ -132,7 +140,7 @@ describe('LarkMcpTool', () => {
       });
 
       toolWithoutClient.registerMcpServer(mockServer);
-      const handlerFunction = (mockServer.tool as jest.Mock).mock.calls[0][3];
+      const handlerFunction = (mockServer.registerTool as jest.Mock).mock.calls[0][2];
 
       const result = await handlerFunction({ content: 'test' });
       expect(result.isError).toBe(true);
@@ -162,7 +170,7 @@ describe('LarkMcpTool', () => {
       });
 
       toolWithCustomHandler.registerMcpServer(mockServer);
-      const handlerFunction = (mockServer.tool as jest.Mock).mock.calls[0][3];
+      const handlerFunction = (mockServer.registerTool as jest.Mock).mock.calls[0][2];
 
       await handlerFunction({ content: 'test' });
       expect(customHandlerMock).toHaveBeenCalledWith(
@@ -213,7 +221,7 @@ describe('LarkMcpTool', () => {
       userTokenTool.updateUserAccessToken('valid-user-token');
 
       userTokenTool.registerMcpServer(mockServer);
-      const handlerFunction = (mockServer.tool as jest.Mock).mock.calls[0][3];
+      const handlerFunction = (mockServer.registerTool as jest.Mock).mock.calls[0][2];
 
       await handlerFunction({ content: 'test' });
       expect(mockLarkOapiHandler).toHaveBeenCalledWith(
@@ -321,7 +329,7 @@ describe('LarkMcpTool', () => {
       // 测试getter
       tool.updateUserAccessToken({ getter: mockGetter });
       tool.registerMcpServer(mockServer);
-      const handlerFunction = (mockServer.tool as jest.Mock).mock.calls[0][3];
+      const handlerFunction = (mockServer.registerTool as jest.Mock).mock.calls[0][2];
       await handlerFunction({ content: 'test', useUAT: true });
       expect(mockGetter).toHaveBeenCalled();
 
@@ -418,7 +426,7 @@ describe('LarkMcpTool', () => {
       });
 
       tool.registerMcpServer(mockServer);
-      const handlerFunction = (mockServer.tool as jest.Mock).mock.calls[0][3];
+      const handlerFunction = (mockServer.registerTool as jest.Mock).mock.calls[0][2];
 
       const result = await handlerFunction({ content: 'test', useUAT: true });
 
@@ -462,7 +470,7 @@ describe('LarkMcpTool', () => {
       });
 
       tool.registerMcpServer(mockServer);
-      const handlerFunction = (mockServer.tool as jest.Mock).mock.calls[0][3];
+      const handlerFunction = (mockServer.registerTool as jest.Mock).mock.calls[0][2];
 
       const result = await handlerFunction({ content: 'test', useUAT: true });
 
@@ -507,7 +515,7 @@ describe('LarkMcpTool', () => {
       });
 
       tool.registerMcpServer(mockServer);
-      const handlerFunction = (mockServer.tool as jest.Mock).mock.calls[0][3];
+      const handlerFunction = (mockServer.registerTool as jest.Mock).mock.calls[0][2];
 
       const result = await handlerFunction({ content: 'test', useUAT: true });
 
@@ -545,7 +553,7 @@ describe('LarkMcpTool', () => {
       mockLarkOapiHandler.mockResolvedValueOnce(apiErrorResult);
 
       tool.registerMcpServer(mockServer);
-      const handlerFunction = (mockServer.tool as jest.Mock).mock.calls[0][3];
+      const handlerFunction = (mockServer.registerTool as jest.Mock).mock.calls[0][2];
 
       const result = await handlerFunction({ content: 'test', useUAT: true });
 
@@ -581,7 +589,7 @@ describe('LarkMcpTool', () => {
       mockLarkOapiHandler.mockResolvedValueOnce(successResult);
 
       tool.registerMcpServer(mockServer);
-      const handlerFunction = (mockServer.tool as jest.Mock).mock.calls[0][3];
+      const handlerFunction = (mockServer.registerTool as jest.Mock).mock.calls[0][2];
 
       const result = await handlerFunction({ content: 'test', useUAT: true });
 
@@ -598,7 +606,7 @@ describe('LarkMcpTool', () => {
 
       // 注册工具并保存handler函数引用
       tool.registerMcpServer(mockServer);
-      const handlerFunction = (mockServer.tool as jest.Mock).mock.calls[0][3];
+      const handlerFunction = (mockServer.registerTool as jest.Mock).mock.calls[0][2];
 
       // 重新设置mock，让handler抛出异常
       mockLarkOapiHandler.mockImplementationOnce(() => {

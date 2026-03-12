@@ -13,7 +13,7 @@ const mockLarkOapiHandler = jest.fn();
 jest.mocked(larkOapiHandler).mockImplementation(mockLarkOapiHandler);
 
 const mockServer = {
-  tool: jest.fn(),
+  registerTool: jest.fn(),
 } as unknown as McpServer;
 
 describe('command surface registry', () => {
@@ -72,7 +72,7 @@ describe('command surface registration', () => {
 
     larkMcpTool.registerCommandMcpServer(mockServer, { toolNameCase: 'snake' });
 
-    expect((mockServer.tool as jest.Mock).mock.calls.map((call) => call[0])).toEqual([
+    expect((mockServer.registerTool as jest.Mock).mock.calls.map((call) => call[0])).toEqual([
       'ls',
       'help',
       'run',
@@ -96,7 +96,7 @@ describe('command surface registration', () => {
     });
 
     larkMcpTool.registerCommandMcpServer(mockServer, { toolNameCase: 'snake' });
-    const runHandler = (mockServer.tool as jest.Mock).mock.calls.find((call) => call[0] === 'run')?.[3];
+    const runHandler = (mockServer.registerTool as jest.Mock).mock.calls.find((call) => call[0] === 'run')?.[2];
 
     const result = await runHandler({
       command: 'chat',

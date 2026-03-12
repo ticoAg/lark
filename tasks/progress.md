@@ -1,6 +1,6 @@
 ---
 schema: lark-progress-v1
-updated: 2026-03-11T21:52:00+08:00
+updated: 2026-03-12T10:56:00+08:00
 focus: completed
 active: []
 blockers: []
@@ -15,6 +15,24 @@ blockers: []
 - 最近完成：优化 docs-only 提交的 GitHub Actions 触发条件
 - 下一步：如后续再引入新的 package / workflow，需要继续同步维护 CI 的 path 过滤规则，避免回到“全仓文档改动也跑完整 package checks”
 - 阻塞：无
+
+## 2026-03-12 10:56 准备发布 0.5.7
+- 里程碑：07 Monorepo 发布与文档收口（维护）
+- 已完成：将包版本从 `0.5.6` 提升到 `0.5.7`，补充 changelog，准备把 latest-only 的 SDK 升级与 `_zod` 启动修复作为新的补丁发布。当前待发布内容包括：`@modelcontextprotocol/sdk@1.27.1`、`@larksuiteoapi/node-sdk@1.59.0`、直接依赖 `zod@3.25.76`、统一切换到最新 `registerTool()` 接口，以及 `run.args` 的 schema 修复。
+- 下一步：执行 `pack:check` 和 `verify_npm_release.py`，然后提交、打 `lark-openapi-mcp-v0.5.7` tag 并推送到远端触发 npm trusted publishing。
+- 阻塞 / 风险：本地 `tsc` 仍需要更高堆上限；发版前已用 `NODE_OPTIONS=--max-old-space-size=8192 npm run build` 通过验证，远端 CI 是否仍用 4GB 即可通过需要以 GitHub Actions 实际结果为准。
+
+## 2026-03-12 10:37 升级 MCP / Lark SDK 到最新稳定版
+- 里程碑：07 Monorepo 发布与文档收口（维护）
+- 已完成：将 `@modelcontextprotocol/sdk` 从 `^1.12.1` 升级到 `^1.27.1`，将 `@larksuiteoapi/node-sdk` 从 `^1.50.0` 升级到 `^1.59.0`；同时补上直接依赖 `zod@^3.25.76`，避免命令层与测试继续隐式依赖 MCP SDK 传递出来的 Zod 版本。按“latest-only”方案移除对旧 `server.tool()` 注册面的兼容假设，统一切到最新 `registerTool()` / 新版 `McpServer` 类型面，并同步更新测试 mock。当前安装树已收口为 `sdk@1.27.1 + zod@3.25.76`。
+- 下一步：如要对外发布，建议基于当前改动发一个补丁版本，让外部 `npx @ticoag/lark-mcp` 用户默认拿到 latest-only 的稳定组合。
+- 阻塞 / 风险：本地 `tsc` 在当前 Node 25 环境下需要更高堆上限；本次以 `NODE_OPTIONS=--max-old-space-size=8192 npm run build` 通过验证。CI 现有 4GB 配置是否足够，建议在发版前再看一眼远端构建结果。
+
+## 2026-03-12 10:31 MCP 启动 `_zod` 报错修复
+- 里程碑：07 Monorepo 发布与文档收口（维护）
+- 已完成：复现 `@ticoag/lark-mcp@0.5.6` 在新安装环境下的 MCP 握手失败；确认 `client.connect()` 成功，但 `tools/list` 返回 `MCP error -32603: Cannot read properties of undefined (reading '_zod')`。根因定位到 `run` facade 的 `args: z.record(z.any()).optional()`：在 `@modelcontextprotocol/sdk@1.27.1` 搭配 Zod v4 的 JSON Schema 转换路径里，单参数版 `z.record(valueSchema)` 会在 record processor 中读取到 `undefined._zod`。已改为显式 key schema 的 `z.record(z.string(), z.any()).optional()`。
+- 下一步：执行本地构建、测试和一次真实 stdio MCP client 握手回归，确认 `ls/help/run/explain` 的工具列表恢复正常。
+- 阻塞 / 风险：当前仓库仍未把 `zod` 声明为直接依赖，未来运行时解析到的 Zod 代际仍受上游依赖影响；这次修复已覆盖本次启动故障路径。
 
 ## 2026-03-11 21:52 收窄 docs-only 场景的 CI 触发范围
 - 里程碑：07 Monorepo 发布与文档收口（维护）

@@ -28,7 +28,7 @@ export function initOAPIMcpServer(options: McpServerOptions, authHandler?: LarkA
   allowTools = Array.from(new Set(allowTools));
 
   // Create MCP Server
-  const mcpServer = new McpServer({ id: 'lark', name: 'Lark MCP', version: currentVersion });
+  const mcpServer = new McpServer({ name: 'Lark MCP', version: currentVersion });
 
   const toolsOptions = allowTools.length
     ? {
@@ -66,12 +66,14 @@ export function initOAPIMcpServer(options: McpServerOptions, authHandler?: LarkA
 
 export function initRecallMcpServer(options: McpServerOptions) {
   const server = new McpServer({
-    id: 'lark-recall-mcp-server',
     name: 'Lark Recall MCP Service',
     version: currentVersion,
   });
-  server.tool(larkmcp.RecallTool.name, larkmcp.RecallTool.description, larkmcp.RecallTool.schema, (params) =>
-    larkmcp.RecallTool.handler(params, options),
+  server.registerTool(
+    larkmcp.RecallTool.name,
+    { description: larkmcp.RecallTool.description, inputSchema: larkmcp.RecallTool.schema as any },
+    (params: any) =>
+      larkmcp.RecallTool.handler(params, options),
   );
   return server;
 }
