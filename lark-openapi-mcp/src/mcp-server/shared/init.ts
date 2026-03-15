@@ -12,8 +12,28 @@ export function initOAPIMcpServer(options: McpServerOptions, authHandler?: LarkA
   const { appId, appSecret, userAccessToken, tokenMode, domain, oauth } = options;
 
   if (!appId || !appSecret) {
-    console.error('Error: Missing App Credentials');
-    throw new Error('Missing App Credentials');
+    const missing = [
+      ...(!appId ? ['LARK_APP_ID (-a / --app-id)'] : []),
+      ...(!appSecret ? ['LARK_APP_SECRET (-s / --app-secret)'] : []),
+    ];
+    const message = [
+      `❌ Missing required credentials: ${missing.join(', ')}`,
+      '',
+      'To get your App ID and App Secret:',
+      '  1. Visit https://open.feishu.cn/ → Developer Console',
+      '  2. Create or select an app',
+      '  3. Copy credentials from "Credentials & Basic Info"',
+      '',
+      'Provide credentials via:',
+      '  • CLI args:  npx @ticoag/lark-mcp mcp -a <APP_ID> -s <APP_SECRET>',
+      '  • Env vars:  export LARK_APP_ID=cli_xxx  export LARK_APP_SECRET=xxx',
+      '  • Config:    npx @ticoag/lark-mcp mcp --config config.json',
+      '',
+      '📖 Setup guide: https://github.com/ticoAg/lark/blob/main/lark-openapi-mcp/docs/usage/configuration/configuration.md',
+      '❓ FAQ: https://github.com/ticoAg/lark/blob/main/lark-openapi-mcp/docs/troubleshooting/faq.md',
+    ].join('\n');
+    console.error(message);
+    throw new Error(`Missing required credentials: ${missing.join(', ')}`);
   }
 
   let allowTools = options.tools || [];

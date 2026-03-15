@@ -265,15 +265,15 @@ npx -y @ticoag/lark-mcp mcp \
 
 ```bash
 # Windows (PowerShell)
-$env:APP_ID="cli_xxxx"
-$env:APP_SECRET="your_secret"
+$env:LARK_APP_ID="cli_xxxx"
+$env:LARK_APP_SECRET="your_secret"
 $env:LARK_TOOLS="im.v1.message.create,calendar.v4.calendar.list"
 $env:LARK_DOMAIN="https://open.feishu.cn"
 $env:LARK_TOKEN_MODE="auto"
 
 # macOS/Linux (Bash/Zsh)
-export APP_ID=cli_xxxx
-export APP_SECRET=your_secret
+export LARK_APP_ID=cli_xxxx
+export LARK_APP_SECRET=your_secret
 export LARK_TOOLS=im.v1.message.create,calendar.v4.calendar.list
 export LARK_DOMAIN=https://open.feishu.cn
 export LARK_TOKEN_MODE=auto
@@ -296,7 +296,7 @@ export LARK_TOKEN_MODE=auto
 }
 ```
 
-> 💡 **提示**：系统会自动读取 `APP_ID` 和 `APP_SECRET` 环境变量，无需在 args 中重复指定。
+> 💡 **提示**：系统会自动读取 `LARK_APP_ID` 和 `LARK_APP_SECRET` 环境变量，无需在 args 中重复指定。
 
 ### 配置文件使用
 
@@ -339,9 +339,9 @@ export LARK_TOKEN_MODE=auto
 
 | 环境变量名 | 命令行参数 | 描述 | 示例值 |
 |-----------|------------|------|--------|
-| `APP_ID` | `-a, --app-id` | 飞书/Lark应用的App ID | `cli_xxxx` |
-| `APP_SECRET` | `-s, --app-secret` | 飞书/Lark应用的App Secret | `your_secret` |
-| `USER_ACCESS_TOKEN` | `-u, --user-access-token` | 用户访问令牌 | `u-zzzzz` |
+| `LARK_APP_ID` | `-a, --app-id` | 飞书/Lark应用的App ID | `cli_xxxx` |
+| `LARK_APP_SECRET` | `-s, --app-secret` | 飞书/Lark应用的App Secret | `your_secret` |
+| `LARK_USER_ACCESS_TOKEN` | `-u, --user-access-token` | 用户访问令牌 | `u-zzzzz` |
 | `LARK_TOOLS` | `-t, --tools` | 启用的API工具列表 | `im.v1.message.create,calendar.v4.calendar.list` |
 | `LARK_DOMAIN` | `-d, --domain` | API域名 | `https://open.feishu.cn` |
 | `LARK_TOKEN_MODE` | `--token-mode` | 令牌模式 | `auto` |

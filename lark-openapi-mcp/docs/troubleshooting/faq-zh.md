@@ -6,7 +6,7 @@
 
 解决方案：
 - 检查本地网络连接、代理设置。
-- 核对 `APP_ID`、`APP_SECRET` 是否填写正确。
+- 核对 `LARK_APP_ID`、`LARK_APP_SECRET` 是否填写正确。
 - 测试是否能正常访问开放平台 API 域名（如 `https://open.feishu.cn` 或 `https://open.larksuite.com`）。
 
 ### 使用 user_access_token 报错

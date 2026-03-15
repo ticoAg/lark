@@ -173,7 +173,7 @@ describe('initOAPIMcpServer', () => {
     );
   });
 
-  it('如果凭证缺失，应该退出程序', () => {
+  it('如果凭证缺失，应该退出程序并列出缺失字段', () => {
     const options = {
       host: 'localhost',
       port: 3000,
@@ -183,9 +183,15 @@ describe('initOAPIMcpServer', () => {
       initOAPIMcpServer(options);
     } catch (error) {
       expect(error).toBeInstanceOf(Error);
+      expect((error as Error).message).toContain('Missing required credentials');
+      expect((error as Error).message).toContain('LARK_APP_ID');
+      expect((error as Error).message).toContain('LARK_APP_SECRET');
     }
 
     expect(console.error).toHaveBeenCalled();
+    const errorMessage = (console.error as jest.Mock).mock.calls[0][0];
+    expect(errorMessage).toContain('https://open.feishu.cn/');
+    expect(errorMessage).toContain('Setup guide');
   });
 
   it('应该处理preset.default工具集', () => {

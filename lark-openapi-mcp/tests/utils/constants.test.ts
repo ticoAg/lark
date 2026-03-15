@@ -37,9 +37,9 @@ describe('Constants', () => {
   describe('OAPI_MCP_ENV_ARGS', () => {
     it('should be empty when no environment variables are set', () => {
       // Clear environment variables
-      delete process.env.APP_ID;
-      delete process.env.APP_SECRET;
-      delete process.env.USER_ACCESS_TOKEN;
+      delete process.env.LARK_APP_ID;
+      delete process.env.LARK_APP_SECRET;
+      delete process.env.LARK_USER_ACCESS_TOKEN;
       delete process.env.LARK_TOKEN_MODE;
       delete process.env.LARK_TOOLS;
       delete process.env.LARK_DOMAIN;
@@ -52,9 +52,9 @@ describe('Constants', () => {
     });
 
     it('should include environment variables when they are set', () => {
-      process.env.APP_ID = 'test-app-id';
-      process.env.APP_SECRET = 'test-app-secret';
-      process.env.USER_ACCESS_TOKEN = 'test-user-token';
+      process.env.LARK_APP_ID = 'test-app-id';
+      process.env.LARK_APP_SECRET = 'test-app-secret';
+      process.env.LARK_USER_ACCESS_TOKEN = 'test-user-token';
       process.env.LARK_TOKEN_MODE = 'manual';
       process.env.LARK_TOOLS = 'tool1,tool2';
       process.env.LARK_DOMAIN = 'https://custom.domain.com';
@@ -73,9 +73,9 @@ describe('Constants', () => {
     });
 
     it('should filter out empty string environment variables', () => {
-      process.env.APP_ID = 'valid-id';
-      process.env.APP_SECRET = '';
-      process.env.USER_ACCESS_TOKEN = undefined;
+      process.env.LARK_APP_ID = 'valid-id';
+      process.env.LARK_APP_SECRET = '';
+      process.env.LARK_USER_ACCESS_TOKEN = undefined;
 
       jest.resetModules();
       const { OAPI_MCP_ENV_ARGS: freshEnvArgs } = require('../../src/utils/constants');

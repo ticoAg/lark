@@ -20,9 +20,9 @@ export const OAPI_MCP_DEFAULT_ARGS = {
 };
 
 export const OAPI_MCP_ENV_ARGS = cleanEnvArgs({
-  appId: process.env.APP_ID,
-  appSecret: process.env.APP_SECRET,
-  userAccessToken: process.env.USER_ACCESS_TOKEN,
+  appId: process.env.LARK_APP_ID,
+  appSecret: process.env.LARK_APP_SECRET,
+  userAccessToken: process.env.LARK_USER_ACCESS_TOKEN,
   tokenMode: process.env.LARK_TOKEN_MODE,
   tools: process.env.LARK_TOOLS,
   deprecatedTools: process.env.LARK_DEPRECATED_TOOLS,

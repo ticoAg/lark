@@ -6,7 +6,7 @@ Below are common issues and solutions, with additional explanations to help iden
 
 Solutions:
 - Check local network connection and proxy settings.
-- Verify that `APP_ID` and `APP_SECRET` are filled in correctly.
+- Verify that `LARK_APP_ID` and `LARK_APP_SECRET` are filled in correctly.
 - Test if you can access the open platform API domain normally (such as `https://open.feishu.cn` or `https://open.larksuite.com`).
 
 ### Error when using user_access_token

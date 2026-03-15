@@ -265,15 +265,15 @@ Using environment variables can avoid exposing sensitive information in configur
 
 ```bash
 # Windows (PowerShell)
-$env:APP_ID="cli_xxxx"
-$env:APP_SECRET="your_secret"
+$env:LARK_APP_ID="cli_xxxx"
+$env:LARK_APP_SECRET="your_secret"
 $env:LARK_TOOLS="im.v1.message.create,calendar.v4.calendar.list"
 $env:LARK_DOMAIN="https://open.feishu.cn"
 $env:LARK_TOKEN_MODE="auto"
 
 # macOS/Linux (Bash/Zsh)
-export APP_ID=cli_xxxx
-export APP_SECRET=your_secret
+export LARK_APP_ID=cli_xxxx
+export LARK_APP_SECRET=your_secret
 export LARK_TOOLS=im.v1.message.create,calendar.v4.calendar.list
 export LARK_DOMAIN=https://open.feishu.cn
 export LARK_TOKEN_MODE=auto
@@ -296,7 +296,7 @@ export LARK_TOKEN_MODE=auto
 }
 ```
 
-> 💡 **Tip**: The system will automatically read `APP_ID` and `APP_SECRET` environment variables, no need to specify them again in args.
+> 💡 **Tip**: The system will automatically read `LARK_APP_ID` and `LARK_APP_SECRET` environment variables, no need to specify them again in args.
 
 ### Configuration File Usage
 
@@ -339,9 +339,9 @@ For complex configurations, you can use JSON configuration files:
 
 | Environment Variable | Command Line Parameter | Description | Example Value |
 |---------------------|------------------------|-------------|---------------|
-| `APP_ID` | `-a, --app-id` | Lark/Feishu app App ID | `cli_xxxx` |
-| `APP_SECRET` | `-s, --app-secret` | Lark/Feishu app App Secret | `your_secret` |
-| `USER_ACCESS_TOKEN` | `-u, --user-access-token` | User access token | `u-zzzzz` |
+| `LARK_APP_ID` | `-a, --app-id` | Lark/Feishu app App ID | `cli_xxxx` |
+| `LARK_APP_SECRET` | `-s, --app-secret` | Lark/Feishu app App Secret | `your_secret` |
+| `LARK_USER_ACCESS_TOKEN` | `-u, --user-access-token` | User access token | `u-zzzzz` |
 | `LARK_TOOLS` | `-t, --tools` | List of enabled API tools | `im.v1.message.create,calendar.v4.calendar.list` |
 | `LARK_DOMAIN` | `-d, --domain` | API domain | `https://open.feishu.cn` |
 | `LARK_TOKEN_MODE` | `--token-mode` | Token mode | `auto` |
